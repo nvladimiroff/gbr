@@ -1,0 +1,37 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ffi (1.17.0)
+    raylib-bindings (0.7.3)
+      ffi (~> 1.16)
+    raylib-bindings (0.7.3-aarch64-linux)
+      ffi (~> 1.16)
+    raylib-bindings (0.7.3-arm64-darwin)
+      ffi (~> 1.16)
+    raylib-bindings (0.7.3-x86_64-darwin)
+      ffi (~> 1.16)
+    raylib-bindings (0.7.3-x86_64-linux)
+      ffi (~> 1.16)
+    zeitwerk (2.7.2)
+
+PLATFORMS
+  aarch64-linux
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux-gnu
+  arm-linux-musl
+  arm64-darwin
+  ruby
+  x86-linux-gnu
+  x86-linux-musl
+  x86_64-darwin
+  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
+
+DEPENDENCIES
+  raylib-bindings (~> 0.7.3)
+  zeitwerk
+
+BUNDLED WITH
+   2.5.10
