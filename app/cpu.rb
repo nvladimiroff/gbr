@@ -8,7 +8,7 @@ class CPU
     @decoder = Decoder.new(self)
     @r = Registers.new
     @rom = rom
-    @ram = Array.new(0x2000, 0)
+    @ram = Array.new(0x8000, 0)
   end
 
 
@@ -19,7 +19,7 @@ class CPU
       @r.pc += 1
     end
   rescue => e
-    $logger.error("Error during instruction: 0x#{current_op.to_s(16)}", e)
+    $logger.error("Error during instruction: 0x#{current_op.to_s(16)}", :exception => e, :registers => @r)
   end
 
 

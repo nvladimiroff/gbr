@@ -13,6 +13,8 @@ class CPU::Decoder
     case instruction['mnemonic']
     when 'NOP' then nop(instruction)
     when 'LD' then ld(instruction)
+    when 'ADD' then add(instruction)
+    when 'SUB' then sub(instruction)
     else
       $logger.warn("[Decoder] Unimplemented mnemonic #{instruction['mnemonic']}")
     end
@@ -23,25 +25,13 @@ class CPU::Decoder
 
   private
 
-    def ld(instruction)
-      write, read = instruction['operands']
-      value = load_data(read)
-
-      if write['immediate']
-        @cpu.set_register(write['name'], value)
-      else
-        @cpu.ram[load_data(write)] = value
-      end
-    end
-
-
     def load_data(op)
       if !op['immediate']
         read = op.clone.tap { |o|
           o['immediate'] = true
         }
         @cpu.ram[load_data(read)]
-      elsif op['name'] == 'n8' || op['name'] == 'a8'
+      elsif op['name'] == 'n8' || op['name'] == 'a8' || op['name'] == 'e8'
         @cpu.next
         @cpu.current_op
       elsif op['name'] == 'n16' || op['name'] == 'a16'
@@ -55,10 +45,39 @@ class CPU::Decoder
     end
 
 
+    def ld(instruction)
+      write, read = instruction['operands']
+      value = load_data(read)
+
+      if write['immediate']
+        @cpu.set_register(write['name'], value)
+      else
+        x = load_data(write)
+        @cpu.ram[x] = value
+      end
+    end
 
 
     def nop(instruction)
       # no-op
+    end
+
+
+    def add(instruction)
+      write, read = instruction['operands']
+      value = load_data(read)
+      old_value = load_data(write)
+
+      @cpu.set_register(write['name'], old_value+value)
+    end
+
+
+    def sub(instruction)
+      write, read = instruction['operands']
+      value = load_data(read)
+      old_value = load_data(write)
+
+      @cpu.set_register(write['name'], old_value-value)
     end
 
 end
