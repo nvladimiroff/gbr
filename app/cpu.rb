@@ -1,23 +1,23 @@
 class CPU
 
-  attr_accessor(:clock, :r, :ram)
+  include CPU::Decoder
+
+  attr_accessor(:r, :mmu)
 
 
   def initialize(rom)
     @cycles = 0
-    @decoder = Decoder.new(self)
     @r = Registers.new
-    @rom = rom
-    @ram = Array.new(0x8000, 0)
     @halted = false
+    @mmu = MMU.new(rom)
+    load_opcodes
   end
 
 
   def run
     loop do
-      @cycles += @decoder.decode_and_execute(current_op)
-
-      @r.pc += 1
+      @cycles += decode_and_execute(current_op)
+      next_instruction
 
       break  if @halted
     end
@@ -37,11 +37,11 @@ class CPU
 
 
   def current_op
-    @rom[@r.pc]
+    @mmu[@r.pc]
   end
 
 
-  def next
+  def next_instruction
     @r.pc += 1
   end
 

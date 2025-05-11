@@ -1,10 +1,9 @@
-class CPU::Decoder
+module CPU::Decoder
 
-  def initialize(cpu)
+  def load_opcodes
     opcodes_yml = YAML.load_file('config/opcodes.yaml')
     @unprefixed = opcodes_yml['unprefixed'].transform_keys { |key| key.to_i(16) }
     @cb_prefixed = opcodes_yml['cbprefixed'].transform_keys { |key| key.to_i(16) }
-    @cpu = cpu
   end
 
 
@@ -33,17 +32,17 @@ class CPU::Decoder
         read = op.clone.tap { |o|
           o['immediate'] = true
         }
-        @cpu.ram[load_data(read)]
+        mmu[load_data(read)]
       elsif op['name'] == 'n8' || op['name'] == 'a8' || op['name'] == 'e8'
-        @cpu.next
-        @cpu.current_op
+        next_instruction
+        current_op
       elsif op['name'] == 'n16' || op['name'] == 'a16'
-        @cpu.next
-        value = @cpu.current_op >> 4
-        @cpu.next
-        value + @cpu.current_op
+        next_instruction
+        value = current_op >> 4
+        next_instruction
+        value + current_op
       else
-        @cpu.register(op['name'])
+        register(op['name'])
       end
     end
 
@@ -53,10 +52,10 @@ class CPU::Decoder
       value = load_data(read)
 
       if write['immediate']
-        @cpu.set_register(write['name'], value)
+        set_register(write['name'], value)
       else
         x = load_data(write)
-        @cpu.ram[x] = value
+        mmu[x] = value
       end
     end
 
@@ -71,7 +70,7 @@ class CPU::Decoder
       value = load_data(read)
       old_value = load_data(write)
 
-      @cpu.set_register(write['name'], old_value+value)
+      set_register(write['name'], old_value+value)
     end
 
 
@@ -80,12 +79,12 @@ class CPU::Decoder
       value = load_data(read)
       old_value = load_data(write)
 
-      @cpu.set_register(write['name'], old_value-value)
+      set_register(write['name'], old_value-value)
     end
 
 
     def halt(instruction)
-      @cpu.halt!
+      halt!
     end
 
 
@@ -93,7 +92,7 @@ class CPU::Decoder
       op = instruction['operands'][0]
       value = load_data(op)
 
-      @cpu.set_register(op['name'], value+1)
+      set_register(op['name'], value+1)
     end
 
 
@@ -101,7 +100,7 @@ class CPU::Decoder
       op = instruction['operands'][0]
       value = load_data(op)
 
-      @cpu.set_register(op['name'], value-1)
+      set_register(op['name'], value-1)
     end
-    
+
 end
