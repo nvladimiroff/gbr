@@ -26,7 +26,7 @@ class CPU::Registers
 
 
   def b
-    @bc & 0xFF00
+    (@bc & 0xFF00) >> 4
   end
 
 
@@ -37,7 +37,7 @@ class CPU::Registers
 
 
   def c
-    @bc & 0x00FF
+    @bc >> 4
   end
 
 
@@ -48,7 +48,7 @@ class CPU::Registers
 
 
   def d
-    @de & 0xFF00
+    (@de & 0xFF00) >> 4
   end
 
 
@@ -59,7 +59,7 @@ class CPU::Registers
 
 
   def e
-    @de & 0x00FF
+    @de >> 4
   end
 
 
@@ -70,7 +70,7 @@ class CPU::Registers
 
 
   def h
-    @hl & 0xFF00
+    (@hl & 0xFF00) >> 4
   end
 
 
@@ -81,7 +81,7 @@ class CPU::Registers
 
 
   def l
-    @hl & 0x00FF
+    @hl >> 4
   end
 
 
