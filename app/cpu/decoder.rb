@@ -15,6 +15,9 @@ class CPU::Decoder
     when 'LD' then ld(instruction)
     when 'ADD' then add(instruction)
     when 'SUB' then sub(instruction)
+    when 'HALT' then halt(instruction)
+    when 'INC' then inc(instruction)
+    when 'DEC' then dec(instruction)
     else
       $logger.warn("[Decoder] Unimplemented mnemonic #{instruction['mnemonic']}")
     end
@@ -80,4 +83,25 @@ class CPU::Decoder
       @cpu.set_register(write['name'], old_value-value)
     end
 
+
+    def halt(instruction)
+      @cpu.halt!
+    end
+
+
+    def inc(instruction)
+      op = instruction['operands'][0]
+      value = load_data(op)
+
+      @cpu.set_register(op['name'], value+1)
+    end
+
+
+    def dec(instruction)
+      op = instruction['operands'][0]
+      value = load_data(op)
+
+      @cpu.set_register(op['name'], value-1)
+    end
+    
 end

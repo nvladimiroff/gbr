@@ -9,6 +9,7 @@ class CPU
     @r = Registers.new
     @rom = rom
     @ram = Array.new(0x8000, 0)
+    @halted = false
   end
 
 
@@ -17,6 +18,8 @@ class CPU
       @cycles += @decoder.decode_and_execute(current_op)
 
       @r.pc += 1
+
+      break  if @halted
     end
   rescue => e
     $logger.error("Error during instruction: 0x#{current_op.to_s(16)}", :exception => e, :registers => @r)
@@ -40,6 +43,11 @@ class CPU
 
   def next
     @r.pc += 1
+  end
+
+
+  def halt!
+    @halted = true
   end
 
 end
