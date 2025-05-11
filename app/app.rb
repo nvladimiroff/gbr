@@ -1,18 +1,16 @@
 class App
 
   def run
+    rom = File.read(ARGV[0]).bytes
+    cpu = CPU.new(rom)
+    cpu.run
+  end
+
+
+  def open_window
     Raylib.load_lib('libraylib')
     Raylib.InitWindow(800, 640, 'Hello world')
     Raylib.SetTargetFPS(60)
-
-    until Raylib.WindowShouldClose()
-      Raylib.BeginDrawing
-      Raylib.ClearBackground(Raylib::RAYWHITE)
-      Raylib.DrawText('Hello world', 190, 200, 20, Raylib::LIGHTGRAY)
-      Raylib.EndDrawing
-    end
-
-    Raylib.CloseWindow
   end
 
 end
