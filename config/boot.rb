@@ -10,4 +10,6 @@ loader.inflector.inflect(
   'mmu' => "MMU"
 )
 loader.setup
-$logger = ActiveSupport::Logger.new(STDOUT)
+SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)
+$logger = SemanticLogger['Gameboy']
+

@@ -57,4 +57,37 @@ class CPU::Registers
     @de = upper + (value & 0xFF00)
   end
 
+
+  def e
+    @de & 0x00FF
+  end
+
+
+  def e=(value)
+    upper = @de & 0xFF00
+    @de = upper + (value & 0x00FF)
+  end
+
+
+  def h
+    @hl & 0xFF00
+  end
+
+
+  def h=(value)
+    upper = @hl & 0x00FF
+    @hl = upper + (value & 0xFF00)
+  end
+
+
+  def l
+    @hl & 0x00FF
+  end
+
+
+  def l=(value)
+    upper = @hl & 0xFF00
+    @hl = upper + (value & 0x00FF)
+  end
+
 end

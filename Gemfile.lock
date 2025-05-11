@@ -36,6 +36,8 @@ GEM
     raylib-bindings (0.7.3-x86_64-linux)
       ffi (~> 1.16)
     securerandom (0.4.1)
+    semantic_logger (4.16.1)
+      concurrent-ruby (~> 1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.3)
@@ -59,6 +61,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   raylib-bindings (~> 0.7.3)
+  semantic_logger
   zeitwerk
 
 BUNDLED WITH
