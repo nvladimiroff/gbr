@@ -1,93 +1,88 @@
-class CPU::Registers
+module CPU::Registers
 
-  attr_accessor(:af, :bc, :de, :hl, :pc, :sp)
+  extend ActiveSupport::Concern
 
 
-  def initialize
-    @af = 0
-    @bc = 0
-    @de = 0
-    @hl = 0
-
-    @pc = 0
-    @sp = 0
+  def zero_flag
+    f[7]
   end
 
 
-  def a
-    @af >> 4
+  def zero_flag=(value)
+    set_bit(f, 7, value)
   end
 
 
-  def a=(value)
-    upper = @af & 0xFF00
-    @af = upper + (value & 0x00FF)
+  def subtract_flag
+    f[6]
   end
 
 
-  def b
-    (@bc & 0xFF00) >> 4
+  def subtract_flag=(value)
+    set_bit(f, 6, value)
   end
 
 
-  def b=(value)
-    upper = @bc & 0x00FF
-    @bc = upper + (value & 0xFF00)
+  def half_carry_flag
+    f[5]
   end
 
 
-  def c
-    @bc >> 4
+  def half_carry_flag=(value)
+    set_bit(f, 5, value)
   end
 
 
-  def c=(value)
-    upper = @bc & 0xFF00
-    @bc = upper + (value & 0x00FF)
+  def carry_flag
+    f[4]
   end
 
 
-  def d
-    (@de & 0xFF00) >> 4
+  def carry_flag=(value)
+    set_bit(f, 4, value)
   end
 
 
-  def d=(value)
-    upper = @de & 0x00FF
-    @de = upper + (value & 0xFF00)
-  end
+  private
+
+    def set_bit(x, pos, value)
+      if value == 0
+        x & ~(2 ** pos)
+      else
+        x | (2 ** pos)
+      end
+    end
 
 
-  def e
-    @de >> 4
-  end
+  class_methods do
+
+    def reg_8_bit(*names)
+      names.each { |name|
+        define_method(name) {
+          (instance_variable_get("@#{name}") || 0) & 0xFF
+        }
+        define_method("#{name}=") { |value|
+          instance_variable_set("@#{name}", value & 0xFF)
+        }
+      }
+    end
 
 
-  def e=(value)
-    upper = @de & 0xFF00
-    @de = upper + (value & 0x00FF)
-  end
+    def reg_16_bit(*names)
+      names.each { |name|
+        reg1 = name[0]
+        reg2 = name[1]
 
+        define_method(name) {
+          instance_variable_get("@#{reg1}") << 8 | instance_variable_get("@#{reg2}")
+        }
+        define_method("#{name}=") { |value|
+          instance_variable_set("@#{reg1}", (value & 0xFF00) >> 8)
+          instance_variable_set("@#{reg2}", value & 0xFF)
+        }
+      }
+    end
 
-  def h
-    (@hl & 0xFF00) >> 4
-  end
-
-
-  def h=(value)
-    upper = @hl & 0x00FF
-    @hl = upper + (value & 0xFF00)
-  end
-
-
-  def l
-    @hl >> 4
-  end
-
-
-  def l=(value)
-    upper = @hl & 0xFF00
-    @hl = upper + (value & 0x00FF)
   end
 
 end

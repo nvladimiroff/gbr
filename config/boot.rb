@@ -1,6 +1,10 @@
+# silence warnings from gems
+old = $VERBOSE
+$VERBOSE = nil
 require 'bundler/setup'
-
 Bundler.require(:default)
+$VERBOSE = old
+
 
 $ROOT = Pathname.new(__dir__ + '/..')
 loader = Zeitwerk::Loader.new
@@ -11,5 +15,6 @@ loader.inflector.inflect(
 )
 loader.setup
 SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)
+SemanticLogger.default_level = :warn
 $logger = SemanticLogger['Gameboy']
 
