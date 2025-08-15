@@ -20,22 +20,10 @@ class Asm
 
   REGISTERS = [:a, :b, :c, :d, :e, :f, :l, :bc]
 
-  OPCODE_MAPPING = {
-    [:nop]           => [0x00],
-    [:ld, :bc, :n16] => [0x01, :n16],
-    [:ld, [:bc], :a] => [0x02],
-    [:ld, :b, :n8]   => [0x06, :n8],
-    [:ld, :b, [:bc]] => [0x0A],
-    [:ld, :a, :n8]   => [0x3e, :n8],
-    [:ld, :b, :a]    => [0x47],
-    [:add, :a, :b]   => [0x80],
-    [:adc, :a, :b]   => [0x88],
-    [:sub, :a, :b]   => [0x90],
-  }
-
 
   def initialize
     @instructions = []
+    @@opcodes ||= Opcodes::OPCODE_MAPPING.invert
   end
 
 
@@ -43,7 +31,19 @@ class Asm
     return sym if REGISTERS.include?(sym)
 
     key = [sym] + map_ints(args)
-    @instructions << unmap_ints(OPCODE_MAPPING[key], to: args.last)
+    opcode = @@opcodes[key]
+
+    if opcode == nil
+      return super
+    end
+
+    instructions = [opcode]
+    instructions << args.last if key.include?(:n8)
+    if key.include?(:n16)
+      instructions += [args.last & 0x00FF, args.last & 0xFF00 >> 8]
+    end
+
+    @instructions << instructions
   rescue
     super
   end
@@ -67,19 +67,6 @@ class Asm
           a > 0xFF ? :n16 : :n8
         else
           a
-        end
-      end
-    end
-
-
-    def unmap_ints(instructions, **opts)
-      instructions.collect_concat do |i|
-        if i == :n8
-          [opts[:to]]
-        elsif i == :n16
-          [opts[:to] & 0x00FF, opts[:to] & 0xFF00 >> 8]
-        else
-          [i]
         end
       end
     end

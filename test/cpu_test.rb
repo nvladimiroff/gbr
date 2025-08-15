@@ -84,4 +84,25 @@ class CPUTest < Minitest::Test
     assert_equal(0xAA, @gb.a)
   end
 
+
+  def test_inc
+    run_program do
+      ld b, 0x00
+      inc b
+    end
+
+    assert_equal(0x01, @gb.b)
+  end
+
+
+  def test_dec
+    run_program do
+      ld b, 0xFF
+      dec b
+    end
+
+    assert_equal(0xFE, @gb.b)
+  end
+
+
 end
