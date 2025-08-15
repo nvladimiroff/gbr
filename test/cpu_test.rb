@@ -3,14 +3,16 @@ require_relative './test_helper'
 class CPUTest < Minitest::Test
 
   def test_nothing
-    run_program()
+    run_program do
+      nop
+    end
 
     assert(true)
   end
 
 
   def test_ld_const_a
-    run_program2 do
+    run_program do
       ld a, 0xFF
     end
 
@@ -19,7 +21,7 @@ class CPUTest < Minitest::Test
 
 
   def test_ld_const_bc
-    run_program2 do
+    run_program do
       ld bc, 0xFFFF
     end
 
@@ -28,7 +30,7 @@ class CPUTest < Minitest::Test
 
 
   def test_ld_a_b
-    run_program2 do
+    run_program do
       ld a, 0xFF
       ld b, a
     end
@@ -38,7 +40,7 @@ class CPUTest < Minitest::Test
 
 
   def test_ld_write_mem
-    run_program2 do
+    run_program do
       ld a, 0xFF
       ld [bc], a
       ld b, [bc]
@@ -50,7 +52,7 @@ class CPUTest < Minitest::Test
 
 
   def test_add
-    run_program2 do
+    run_program do
       ld a, 0xAA
       ld b, 0x55
       add a, b
@@ -61,7 +63,7 @@ class CPUTest < Minitest::Test
 
 
   def test_adc
-    run_program2 do
+    run_program do
       ld a, 0xFF
       ld b, 0x01
       add a, b
@@ -73,7 +75,7 @@ class CPUTest < Minitest::Test
 
 
   def test_sub
-    run_program2 do
+    run_program do
       ld a, 0xFF
       ld b, 0x55
       sub a, b

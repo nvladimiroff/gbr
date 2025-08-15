@@ -3,17 +3,11 @@ require 'minitest/autorun'
 
 class Minitest::Test
 
-
-  def run_program(*data)
-    @rom = [0x00] * 0x100 + data
-    @gb = Gameboy.new(@rom)
-    @gb.run_for(limit: data.length - 1)
-  end
-
-
-  def run_program2(&block)
+  def run_program(&block)
     program = Asm.new
-    program.instance_eval(&block)
+    if block_given?
+      program.instance_eval(&block)
+    end
     @rom = [0x00] * 0x100 + program.compile
     @gb = Gameboy.new(@rom)
     @gb.run_for(limit: program.length)
