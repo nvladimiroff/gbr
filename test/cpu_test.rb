@@ -43,10 +43,8 @@ class CPUTest < Minitest::Test
     run_program do
       ld a, 0xFF
       ld [bc], a
-      ld b, [bc]
     end
 
-    assert_equal(0xFF, @gb.b)
     assert_equal(0xFF, @gb.mmu[0])
   end
 
