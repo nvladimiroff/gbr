@@ -103,4 +103,44 @@ class CPUTest < Minitest::Test
   end
 
 
+  def test_bool
+    run_program do
+      ld a, 0xFF
+      ld b, 0xF0
+      and_ a, b
+      or_ a, 0x0F
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xF0, @gb.b)
+  end
+
+
+  def test_jump
+    run_program do
+      jr 0x2
+      ld b, 0xFF
+      ld a, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    refute_equal(0xFF, @gb.b)
+  end
+
+
+  def test_cond_jump
+    run_program do
+      ld a, 0x00
+      ld c, 0x01
+      add a, c
+      jr nz, 0x2
+      ld b, 0xFF
+      ld a, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    refute_equal(0xFF, @gb.b)
+  end
+
+
 end

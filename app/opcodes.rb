@@ -7,7 +7,7 @@ module Opcodes
     end
 
     def value?(sym)
-      %i(a b c d e h l f af bc de hl sp n8 n16).include?(sym)
+      %i(a b c d e h l f af bc de hl sp n8 n16 z nz c nc).include?(sym)
     end
   end
 

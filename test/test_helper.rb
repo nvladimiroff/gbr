@@ -18,7 +18,7 @@ end
 
 class Asm
 
-  REGISTERS = [:a, :b, :c, :d, :e, :f, :l, :bc]
+  VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :nz]
 
 
   def initialize
@@ -28,13 +28,13 @@ class Asm
 
 
   def method_missing(sym, *args)
-    return sym if REGISTERS.include?(sym)
+    return sym if VALUES.include?(sym)
 
     key = [sym] + map_ints(args)
     opcode = @@opcodes[key]
 
     if opcode == nil
-      return super
+      raise "Missing opcode: #{key}"
     end
 
     instructions = [opcode]
@@ -44,8 +44,6 @@ class Asm
     end
 
     @instructions << instructions
-  rescue
-    super
   end
 
 

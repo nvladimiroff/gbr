@@ -4,7 +4,7 @@ module CPU::Registers
 
 
   def zero_flag
-    f[7]
+    f[7] == 1
   end
 
 
@@ -14,7 +14,7 @@ module CPU::Registers
 
 
   def subtract_flag
-    f[6]
+    f[6] == 1
   end
 
 
@@ -24,7 +24,7 @@ module CPU::Registers
 
 
   def half_carry_flag
-    f[5]
+    f[5] == 1
   end
 
 
@@ -34,7 +34,7 @@ module CPU::Registers
 
 
   def carry_flag
-    f[4]
+    f[4] == 1
   end
 
 

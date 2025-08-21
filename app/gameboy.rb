@@ -46,6 +46,16 @@ class Gameboy
       decode_and_execute(op)
     rescue => e
       $logger.error("Error during instruction: 0x#{@mmu[@pc].to_s(16)}", :exception => e)
+      $logger.error(mmu.inspect)
+    end
+
+
+    def decode_and_execute(opcode)
+      instructions = OPCODE_MAPPING[opcode]
+
+      raise "Unimplemented opcode" unless instructions
+
+      send(*instructions)
     end
 
 
@@ -206,12 +216,51 @@ class Gameboy
     end
 
 
-    def decode_and_execute(opcode)
-      instructions = OPCODE_MAPPING[opcode]
+    def and_(dest, src)
+      dest_value = load(dest)
+      src_value = load(dest)
+      result = dest_value & src_value
 
-      raise "Unimplemented opcode" unless instructions
+      assign(dest, result)
 
-      send(*instructions)
+      self.zero_flag = result
+      self.subtract_flag = false
+      self.carry_flag = false
+      self.half_carry_flag = true
+    end
+
+
+    def or_(dest, src)
+      dest_value = load(dest)
+      src_value = load(dest)
+      result = dest_value | src_value
+
+      assign(dest, result)
+
+      self.zero_flag = result
+      self.subtract_flag = false
+      self.carry_flag = false
+      self.half_carry_flag = false
+    end
+
+
+    def jr(*args)
+      condition = case args.first
+      when :z
+        zero_flag
+      when :nz
+        !zero_flag
+      when :c
+        carry_flag
+      when :nc
+        !carry_flag
+      else
+        true
+      end
+
+      increment = args.length == 1 ? args.first : args.second
+
+      @pc = load(increment) + @pc if condition
     end
 
 end
