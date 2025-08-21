@@ -143,15 +143,15 @@ class Gameboy
 
 
     def add(dest, src)
-      value = load(src)
-      old_value = load(dest)
-      new_value = value + old_value
+      src_value = load(src)
+      dst_value = load(dest)
+      new_value = src_value + dst_value
       assign(dest, new_value)
 
       self.zero_flag = new_value == 0
       self.subtract_flag = false
-      self.carry_flag = new_value > self.a
-      self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
+      self.carry_flag = new_value > 0xFF
+      self.half_carry_flag = (dst_value & 0xF) + (load(dest) & 0xF) > 0xF
     end
 
 

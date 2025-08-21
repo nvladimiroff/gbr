@@ -9,7 +9,7 @@ module CPU::Registers
 
 
   def zero_flag=(value)
-    set_bit(f, 7, value)
+    self.f = set_bit(f, 7, value)
   end
 
 
@@ -19,7 +19,7 @@ module CPU::Registers
 
 
   def subtract_flag=(value)
-    set_bit(f, 6, value)
+    self.f = set_bit(f, 6, value)
   end
 
 
@@ -29,7 +29,7 @@ module CPU::Registers
 
 
   def half_carry_flag=(value)
-    set_bit(f, 5, value)
+    self.f = set_bit(f, 5, value)
   end
 
 
@@ -39,14 +39,14 @@ module CPU::Registers
 
 
   def carry_flag=(value)
-    set_bit(f, 4, value)
+    self.f = set_bit(f, 4, value)
   end
 
 
   private
 
     def set_bit(x, pos, value)
-      if value == 0
+      unless value
         x & ~(2 ** pos)
       else
         x | (2 ** pos)
