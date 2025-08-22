@@ -51,16 +51,11 @@ class Gameboy
 
 
     def decode_and_execute(opcode)
-      instructions = OPCODE_MAPPING[opcode]
+      instructions = MAPPING[opcode]
 
       raise "Unimplemented opcode" unless instructions
 
       send(*instructions)
-    end
-
-
-    def halt
-      @halted = true
     end
 
 
@@ -132,6 +127,11 @@ class Gameboy
     end
 
 
+    def reg_is_16bit?(reg)
+      reg.to_s.length > 1
+    end
+
+
     def nop
     end
 
@@ -148,10 +148,16 @@ class Gameboy
       new_value = src_value + dst_value
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
-      self.subtract_flag = false
-      self.carry_flag = new_value > 0xFF
-      self.half_carry_flag = (dst_value & 0xF) + (load(dest) & 0xF) > 0xF
+      if reg_is_16bit?(src)
+        self.subtract_flag = false
+        self.carry_flag = new_value > 0xFFFF
+        self.half_carry_flag = (dst_value & 0xFFF) + (src_value & 0xFFF) > 0xFFF
+      else
+        self.zero_flag = new_value == 0
+        self.subtract_flag = false
+        self.carry_flag = new_value > 0xFF
+        self.half_carry_flag = (dst_value & 0xF) + (src_value & 0xF) > 0xF
+      end
     end
 
 
@@ -163,7 +169,7 @@ class Gameboy
 
       self.zero_flag = new_value == 0
       self.subtract_flag = false
-      self.carry_flag = new_value > self.a
+      self.carry_flag = new_value > 0xFF
       self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
     end
 
@@ -176,7 +182,7 @@ class Gameboy
 
       self.zero_flag = new_value == 0
       self.subtract_flag = true
-      self.carry_flag = new_value < self.a
+      self.carry_flag = new_value < 0xFF
       self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
     end
 
@@ -189,7 +195,7 @@ class Gameboy
 
       self.zero_flag = new_value == 0
       self.subtract_flag = true
-      self.carry_flag = new_value < self.a
+      self.carry_flag = new_value < 0xFF
       self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
     end
 
@@ -201,7 +207,7 @@ class Gameboy
 
       self.zero_flag = new_value == 0
       self.subtract_flag = false
-      self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
+      self.half_carry_flag = (value & 0xF) + 1 > 0xF;
     end
 
 
@@ -212,7 +218,7 @@ class Gameboy
 
       self.zero_flag = new_value == 0
       self.subtract_flag = true
-      self.half_carry_flag = (a & 0xF) + (value & 0xF) > 0xF;
+      self.half_carry_flag = (value & 0xF) - 1 > 0xF;
     end
 
 
