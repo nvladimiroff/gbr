@@ -23,7 +23,7 @@ class Asm
 
   def initialize
     @instructions = []
-    @@opcodes ||= Opcodes::OPCODE_MAPPING.invert
+    @@opcodes ||= Opcodes::MAPPING.invert
   end
 
 
