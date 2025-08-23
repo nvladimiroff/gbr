@@ -128,7 +128,7 @@ class CPUTest < Minitest::Test
   end
 
 
-  def test_cond_jump
+  def test_cond_jr
     run_program do
       ld a, 0x00
       ld c, 0x01
@@ -141,6 +141,23 @@ class CPUTest < Minitest::Test
     assert_equal(0xFF, @gb.a)
     refute_equal(0xFF, @gb.b)
   end
+
+
+  def test_cond_jp
+    run_program do
+      ld a, 0x00
+      ld c, 0x01
+      add a, c
+      jp nz, 0x10A
+      ld b, 0xFF
+      ld a, 0xFF
+    end
+    @gb.dump_state
+
+    assert_equal(0xFF, @gb.a)
+    refute_equal(0xFF, @gb.b)
+  end
+
 
 
 end

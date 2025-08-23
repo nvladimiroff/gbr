@@ -285,4 +285,24 @@ class Gameboy
       @pc = load(increment) + @pc if condition
     end
 
+
+    def jp(*args)
+      condition = case args.first
+      when :z
+        zero_flag
+      when :nz
+        !zero_flag
+      when :c
+        carry_flag
+      when :nc
+        !carry_flag
+      else
+        true
+      end
+
+      address = args.length == 1 ? args.first : args.second
+
+      @pc = load(address) if condition
+    end
+
 end
