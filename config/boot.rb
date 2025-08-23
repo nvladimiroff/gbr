@@ -18,3 +18,10 @@ SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)
 SemanticLogger.default_level = :warn
 $logger = SemanticLogger['Gameboy']
 
+module ToHex
+  def to_hex
+    "0x#{to_s(16)}"
+  end
+end
+
+Integer.include(ToHex)

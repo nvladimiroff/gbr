@@ -42,12 +42,10 @@ class Gameboy
     Console.new.display_until_quit { |out|
       out.write("REGISTERS\n\n")
       out.row(*%w(PC SP A B C D E F H L))
-      out.row(*[@pc, @sp, @a, @b, @c, @d, @e, @f, @h, @l].map do |reg|
-        "0x#{reg.to_s(16)}"
-      end)
+      out.row(*[@pc, @sp, @a, @b, @c, @d, @e, @f, @h, @l].map(&:to_hex))
       out.write("\n\nMEMORY\n\n")
       memory_range.each.with_index do |i, index|
-        out.write("0x#{mmu[i].to_s(16)}\t")
+        out.write("#{mmu[i].to_hex}\t")
         out.write("\n") if (index+1) % 16 == 0
       end
     }
@@ -61,7 +59,7 @@ class Gameboy
       @pc += 1
       decode_and_execute(op)
     rescue => e
-      $logger.error("Error during instruction: 0x#{@mmu[@pc].to_s(16)}", :exception => e)
+      $logger.error("Error during instruction: #{@mmu[@pc].to_hex}", :exception => e)
       $logger.error(mmu.inspect)
     end
 
