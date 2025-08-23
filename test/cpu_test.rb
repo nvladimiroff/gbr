@@ -152,7 +152,6 @@ class CPUTest < Minitest::Test
       ld b, 0xFF
       ld a, 0xFF
     end
-    @gb.dump_state
 
     assert_equal(0xFF, @gb.a)
     refute_equal(0xFF, @gb.b)

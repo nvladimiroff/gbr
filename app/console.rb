@@ -20,8 +20,20 @@ class Console
   end
 
 
+  def line(text)
+    write(text + "\n")
+  end
+
+
   def row(*cells)
     @out.write(cells.join("\t")+"\n")
+  end
+
+
+  def section(title=nil)
+    @out.write(title + "\n\n") if title
+    yield
+    @out.write("\n\n")
   end
 
 

@@ -39,25 +39,31 @@ class Gameboy
 
 
   def dump_state(memory_range = 0x100..0x14F)
-    Console.new.display_until_quit { |out|
-      out.write("REGISTERS\n\n")
-      out.row(*%w(PC SP A B C D E F H L))
-      out.row(*[@pc, @sp, @a, @b, @c, @d, @e, @f, @h, @l].map(&:to_hex))
-      out.write("\n\nMEMORY\n\n")
-      memory_range.each.with_index do |i, index|
-        out.write("#{mmu[i].to_hex}\t")
-        out.write("\n") if (index+1) % 16 == 0
+    Console.new.display_until_quit do |out|
+      out.section("REGISTERS") do
+        out.row(*%w(PC SP A B C D E F H L))
+        out.row(*[@pc, @sp, @a, @b, @c, @d, @e, @f, @h, @l].map(&:to_hex))
       end
-    }
+
+      out.section("INSTRUCTIONS") do
+        out.line("Last instruction executed: #{MAPPING[@op]}")
+      end
+
+      out.section("MEMORY") do
+        memory_range.each_slice(16) do |group|
+          out.row(*group.map { |addr| mmu[addr].to_hex })
+        end
+      end
+    end
   end
 
 
   private
 
     def step
-      op = @mmu[@pc]
+      @op = @mmu[@pc]
       @pc += 1
-      decode_and_execute(op)
+      decode_and_execute(@op)
     rescue => e
       $logger.error("Error during instruction: #{@mmu[@pc].to_hex}", :exception => e)
       $logger.error(mmu.inspect)
