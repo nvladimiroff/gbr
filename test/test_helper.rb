@@ -40,7 +40,7 @@ class Asm
     instructions = [opcode]
     instructions << args.last if key.include?(:n8)
     if key.include?(:n16)
-      instructions += [args.last & 0x00FF, args.last & 0xFF00 >> 8]
+      instructions += [args.last & 0x00FF, (args.last & 0xFF00) >> 8]
     end
 
     @instructions << instructions
