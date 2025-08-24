@@ -158,5 +158,15 @@ class CPUTest < Minitest::Test
   end
 
 
+  def test_halt
+    run_program do
+      ld a, 0xFF
+      halt
+      ld b, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    refute_equal(0xFF, @gb.b)
+  end
 
 end

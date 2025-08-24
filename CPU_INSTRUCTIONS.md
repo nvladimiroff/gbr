@@ -14,7 +14,7 @@
  - [ ] CPL
  - [ ] SCF
  - [ ] CCF
- - [ ] HALT
+ - [X] HALT
  - [X] ADC
  - [X] SUB
  - [X] SBC*

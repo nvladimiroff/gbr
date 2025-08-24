@@ -21,6 +21,8 @@ class Gameboy
     @f = 0
     @h = 0
     @l = 0
+
+    @halted = false
   end
 
 
@@ -61,9 +63,13 @@ class Gameboy
   private
 
     def step
-      @op = @mmu[@pc]
-      @pc += 1
-      decode_and_execute(@op)
+      unless @halted
+        @op = @mmu[@pc]
+        @pc += 1
+        decode_and_execute(@op)
+      else
+        @cycles += 4
+      end
     rescue => e
       $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
       $logger.error(mmu.inspect)
@@ -307,6 +313,11 @@ class Gameboy
       address = args.length == 1 ? args.first : args.second
 
       @pc = load(address) if condition
+    end
+
+
+    def halt
+      @halted = true
     end
 
 end
