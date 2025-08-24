@@ -31,7 +31,7 @@ class Console
 
 
   def section(title=nil)
-    @out.write(title + "\n\n") if title
+    @out.write(bold(title) + "\n\n") if title
     yield
     @out.write("\n\n")
   end
@@ -90,8 +90,8 @@ class Console
     end
 
 
-    def reset
-      csi '0m'
+    def bold(text)
+      csi('1m') + text + csi('0m')
     end
 
 end
