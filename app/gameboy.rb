@@ -51,7 +51,7 @@ class Gameboy
 
       out.section("MEMORY") do
         memory_range.each_slice(16) do |group|
-          out.row(*group.map { |addr| mmu[addr].to_hex })
+          out.row(*group.map { |addr| @mmu[addr].to_hex })
         end
       end
     end
@@ -65,7 +65,7 @@ class Gameboy
       @pc += 1
       decode_and_execute(@op)
     rescue => e
-      $logger.error("Error during instruction: #{@mmu[@pc].to_hex}", :exception => e)
+      $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
       $logger.error(mmu.inspect)
     end
 
