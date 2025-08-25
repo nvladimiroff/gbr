@@ -29,8 +29,8 @@
  - [ ] PUSH
  - [ ] RST
  - [ ] PREFIX
- - [ ] DI
- - [ ] EI
+ - [X] DI
+ - [X] EI
 
  - [ ] RLC
  - [ ] RRC

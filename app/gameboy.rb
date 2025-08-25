@@ -398,4 +398,14 @@ class Gameboy
       @sp += 2
     end
 
+
+    def di
+      @ime = false
+    end
+
+
+    def ei
+      @ime = true
+    end
+
 end

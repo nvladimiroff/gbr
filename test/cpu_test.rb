@@ -170,7 +170,7 @@ class CPUTest < Minitest::Test
   end
 
 
-  def test_interrupt
+  def test_vblank
     set_interrupt_handler(0x40) do
       ld a, 0xFF
       reti
@@ -183,6 +183,63 @@ class CPUTest < Minitest::Test
     end
 
     assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+  def test_interrupts_disabled
+    set_interrupt_handler(0x40) do
+      ld a, 0xFF
+      reti
+    end
+
+    load_program do
+      di
+      ld b, 0xFF
+    end
+
+    @gb.step
+    @gb.send_interrupt(:vblank)
+    @gb.step
+
+    refute_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+  def test_di_ei_toggle
+    set_interrupt_handler(0x40) do
+      ld a, 0xFF
+      reti
+    end
+
+    load_program do
+      di
+      ei
+      ld b, 0xFF
+    end
+
+    2.times { @gb.step }
+    @gb.send_interrupt(:vblank)
+    3.times { @gb.step }
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+
+  def test_interrupt_doesnt_fire_without_interrupt
+    set_interrupt_handler(0x40) do
+      ld a, 0xFF
+      reti
+    end
+
+    run_program(limit: 5) do
+      ld b, 0xFF
+    end
+
+    refute_equal(0xFF, @gb.a)
     assert_equal(0xFF, @gb.b)
   end
 

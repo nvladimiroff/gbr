@@ -14,10 +14,16 @@ class Minitest::Test
   end
 
 
-  def run_program(**opts, &block)
+  def load_program(&block)
     program = Asm.compile(&block)
-
     map_code(program.binary, start: 0x100)
+
+    program
+  end
+
+
+  def run_program(**opts, &block)
+    program = load_program(&block)
 
     limit = opts[:limit] || program.length
     limit.times do
