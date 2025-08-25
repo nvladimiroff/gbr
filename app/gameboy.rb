@@ -10,8 +10,8 @@ class Gameboy
   def initialize(rom)
     @mmu = MMU.new(rom)
     @pc = 0x0100
-    @sp = 0x0
-    @cycles = 0
+    @sp = 0xfffe
+    @ticks = 0
 
     @a = 0
     @b = 0
@@ -23,19 +23,24 @@ class Gameboy
     @l = 0
 
     @halted = false
+    @ime = true
   end
 
 
-  def run
-    loop do
-      step
-    end
-  end
+  def send_interrupt(type)
+    return unless interrupt_enabled(type)
 
-
-  def run_for(**opts)
-    opts[:limit].times do
-      step
+    case type
+    when :vblank
+      @mmu[0xFF0F] |= 0x01
+    when :lcd_stat
+      @mmu[0xFF0F] |= 0x02
+    when :timer_overflow
+      @mmu[0xFF0F] |= 0x04
+    when :serial
+      @mmu[0xFF0F] |= 0x08
+    when :joypad
+      @mmu[0xFF0F] |= 0x10
     end
   end
 
@@ -51,6 +56,10 @@ class Gameboy
         out.line("Last instruction executed: #{MAPPING[@op]}")
       end
 
+      out.section("INTERRUPTS") do
+        out.line("Pending interrupts: #{pending_interrupts}")
+      end
+
       out.section("MEMORY") do
         memory_range.each_slice(16) do |group|
           out.row(*group.map { |addr| @mmu[addr].to_hex })
@@ -60,21 +69,25 @@ class Gameboy
   end
 
 
-  private
-
-    def step
-      unless @halted
-        @op = @mmu[@pc]
-        @pc += 1
-        decode_and_execute(@op)
-      else
-        @cycles += 4
-      end
-    rescue => e
-      $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
-      $logger.error(mmu.inspect)
+  def step
+    pending_interrupts.each do |interrupt|
+      next unless @ime
+      handle_interrupt(interrupt)
     end
 
+    unless @halted
+      @op = @mmu[@pc]
+      @pc += 1
+      decode_and_execute(@op)
+    else
+      @ticks += 4
+    end
+  rescue => e
+    $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
+  end
+
+
+  private
 
     def decode_and_execute(opcode)
       instructions = MAPPING[opcode]
@@ -82,6 +95,64 @@ class Gameboy
       raise "Unimplemented opcode" unless instructions
 
       send(*instructions)
+    end
+
+
+    def pending_interrupts
+      interrupts = []
+
+      if @mmu[0xFF0F] & 0x01 == 1
+        interrupts << :vblank
+      end
+
+      if @mmu[0xFF0F] & 0x02 == 1
+        interrupts << :lcd_stat
+      end
+
+      if @mmu[0xFF0F] & 0x04 == 1
+        interrupts << :timer_overflow
+      end
+
+      if @mmu[0xFF0F] & 0x08 == 1
+        interrupts << :serial
+      end
+
+      if @mmu[0xFF0F] & 0x10 == 1
+        interrupts << :joypad
+      end
+
+      interrupts
+    end
+
+
+    def interrupt_enabled(type)
+      true
+    end
+
+
+    def handle_interrupt(type)
+      case type
+      when :vblank
+        addr = 0x40
+        @mmu[0xFF0F] &= 0b1111_1110
+      when :lcd_stat
+        addr = 0x48
+        @mmu[0xFF0F] &= 0b1111_1101
+      when :timer_overflow
+        addr = 0x50
+        @mmu[0xFF0F] &= 0b1111_1011
+      when :serial
+        addr = 0x58
+        @mmu[0xFF0F] &= 0b1111_0111
+      when :joypad
+        addr = 0x60
+        @mmu[0xFF0F] &= 0b1110_1111
+      end
+
+      @sp -= 2
+      @mmu.write_word(@sp, @pc)
+      @pc = addr
+      @ime = false
     end
 
 
@@ -318,6 +389,13 @@ class Gameboy
 
     def halt
       @halted = true
+    end
+
+
+    def reti
+      @ime = true
+      @pc = @mmu.read_word(@sp)
+      @sp += 2
     end
 
 end

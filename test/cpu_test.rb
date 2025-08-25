@@ -169,4 +169,21 @@ class CPUTest < Minitest::Test
     refute_equal(0xFF, @gb.b)
   end
 
+
+  def test_interrupt
+    set_interrupt_handler(0x40) do
+      ld a, 0xFF
+      reti
+    end
+
+    @gb.send_interrupt(:vblank)
+
+    run_program(limit: 5) do
+      ld b, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
 end

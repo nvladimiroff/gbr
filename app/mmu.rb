@@ -16,6 +16,17 @@ class MMU
   end
 
 
+  def read_word(addr)
+    @memory[addr] + (@memory[addr+1] << 8)
+  end
+
+
+  def write_word(addr, value)
+    @memory[addr] = value & 0xFF
+    @memory[addr+1] = value >> 8
+  end
+
+
   private
 
     def map_rom(rom)

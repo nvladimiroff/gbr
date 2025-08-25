@@ -3,15 +3,38 @@ require 'minitest/autorun'
 
 class Minitest::Test
 
-  def run_program(&block)
-    program = Asm.new
-    if block_given?
-      program.instance_eval(&block)
-    end
-    @rom = [0x00] * 0x100 + program.compile
-    @gb = Gameboy.new(@rom)
-    @gb.run_for(limit: program.length)
+  def setup
+    @gb = Gameboy.new([])
   end
+
+
+  def set_interrupt_handler(addr, &block)
+    handler = Asm.compile(&block)
+    map_code(handler.binary, start: addr)
+  end
+
+
+  def run_program(**opts, &block)
+    program = Asm.compile(&block)
+
+    map_code(program.binary, start: 0x100)
+
+    limit = opts[:limit] || program.length
+    limit.times do
+      @gb.step
+    end
+  end
+
+
+  private
+
+    def map_code(program, **opts)
+      start = opts[:start] || 0
+
+      program.each_with_index { |byte, i|
+        @gb.mmu[start+i] = byte
+      }
+    end
 
 end
 
@@ -19,6 +42,13 @@ end
 class Asm
 
   VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :nz]
+
+
+  def self.compile(&block)
+    asm = new
+    asm.instance_eval(&block)
+    asm
+  end
 
 
   def initialize
@@ -47,7 +77,7 @@ class Asm
   end
 
 
-  def compile
+  def binary
     @instructions.flatten
   end
 
