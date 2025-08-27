@@ -8,9 +8,14 @@ class Minitest::Test
   end
 
 
-  def set_interrupt_handler(addr, &block)
+  def set_proc(addr, &block)
     handler = Asm.compile(&block)
     map_code(handler.binary, start: addr)
+  end
+
+
+  def set_interrupt_handler(...)
+    set_proc(...)
   end
 
 
@@ -59,7 +64,7 @@ class Asm
 
   def initialize
     @instructions = []
-    @@opcodes ||= Opcodes::MAPPING.invert
+    @@opcodes ||= CPU::Opcodes::MAPPING.invert
   end
 
 

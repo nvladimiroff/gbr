@@ -243,4 +243,64 @@ class CPUTest < Minitest::Test
     assert_equal(0xFF, @gb.b)
   end
 
+
+  def test_interrupt_clears_halt
+    set_interrupt_handler(0x40) do
+      ld a, 0xFF
+      reti
+    end
+
+    load_program do
+      halt
+      ld b, 0xFF
+    end
+
+    2.times { @gb.step }
+    @gb.send_interrupt(:vblank)
+    3.times { @gb.step }
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+  def test_call
+    set_proc(0x200) do
+      ld a, 0xFF
+      ret
+    end
+
+    run_program(limit: 5) do
+      call nz, 0x200
+      ld b, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+  def test_double_call
+    set_proc(0x200) do
+      call 0x300
+      ld a, 0xFF
+      ret
+    end
+
+    set_proc(0x300) do
+      ld b, 0xFF
+      ret
+    end
+
+    run_program(limit: 10) do
+      call 0x200
+      ld c, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+    assert_equal(0xFF, @gb.c)
+  end
+
+
 end

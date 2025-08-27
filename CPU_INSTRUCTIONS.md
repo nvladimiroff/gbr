@@ -22,15 +22,16 @@
  - [X] OR
  - [ ] XOR
  - [ ] CP
- - [ ] RET
+ - [X] RET
  - [ ] POP
  - [X] JP
- - [ ] CALL
+ - [X] CALL
  - [ ] PUSH
  - [ ] RST
  - [ ] PREFIX
  - [X] DI
  - [X] EI
+ - [X] RETI
 
  - [ ] RLC
  - [ ] RRC

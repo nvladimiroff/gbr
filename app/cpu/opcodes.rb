@@ -1,4 +1,4 @@
-module Opcodes
+module CPU::Opcodes
 
   class << self
     def method_missing(sym, *args)
