@@ -23,10 +23,10 @@
  - [ ] XOR
  - [ ] CP
  - [X] RET
- - [ ] POP
+ - [X] POP
  - [X] JP
  - [X] CALL
- - [ ] PUSH
+ - [X] PUSH
  - [ ] RST
  - [ ] PREFIX
  - [X] DI

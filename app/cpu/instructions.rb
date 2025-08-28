@@ -124,42 +124,16 @@ module CPU::Instructions
 
 
     def jr(*args)
-      condition = case args.first
-      when :z
-        zero_flag
-      when :nz
-        !zero_flag
-      when :c
-        carry_flag
-      when :nc
-        !carry_flag
-      else
-        true
-      end
-
       increment = args.length == 1 ? args.first : args.second
 
-      @pc = load(increment) + @pc if condition
+      @pc = load(increment) + @pc if condition_met?(args.first)
     end
 
 
     def jp(*args)
-      condition = case args.first
-      when :z
-        zero_flag
-      when :nz
-        !zero_flag
-      when :c
-        carry_flag
-      when :nc
-        !carry_flag
-      else
-        true
-      end
-
       address = args.length == 1 ? args.first : args.second
 
-      @pc = load(address) if condition
+      @pc = load(address) if condition_met?(args.first)
     end
 
 
@@ -201,7 +175,6 @@ module CPU::Instructions
       @pc = @mmu.read_word(@sp)
       @sp += 2
     end
-
 
 
     def add(dest, src)
@@ -283,5 +256,18 @@ module CPU::Instructions
       self.half_carry_flag = (value & 0xF) - 1 > 0xF;
     end
 
+
+    def push(src)
+      value = load(src)
+      @sp -= 2
+      @mmu.write_word(@sp, value)
+    end
+
+
+    def pop(dst)
+      value = @mmu.read_word(@sp)
+      @sp += 2
+      assign(dst, value)
+    end
 
 end

@@ -52,7 +52,7 @@ end
 
 class Asm
 
-  VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :nz]
+  VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :de, :nz, :z]
 
 
   def self.compile(&block)

@@ -266,17 +266,19 @@ class CPUTest < Minitest::Test
 
   def test_call
     set_proc(0x200) do
-      ld a, 0xFF
+      ld c, 0xFF
       ret
     end
 
-    run_program(limit: 5) do
+    run_program(limit: 10) do
+      ld a, 0
+      add a, 1
       call nz, 0x200
       ld b, 0xFF
     end
 
-    assert_equal(0xFF, @gb.a)
     assert_equal(0xFF, @gb.b)
+    assert_equal(0xFF, @gb.c)
   end
 
 
@@ -302,5 +304,33 @@ class CPUTest < Minitest::Test
     assert_equal(0xFF, @gb.c)
   end
 
+
+  def test_doesnt_call_if_condition_not_met
+    set_proc(0x200) do
+      ld a, 0xFF
+      ret
+    end
+
+    run_program(limit: 10) do
+      ld a, 0
+      add a, 1
+      call z, 0x200
+      ld b, 0xFF
+    end
+
+    refute_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+  end
+
+
+  def test_pop_push
+    run_program do
+      ld bc, 0xFFFF
+      push bc
+      pop de
+    end
+
+    assert_equal(0xFFFF, @gb.de)
+  end
 
 end
