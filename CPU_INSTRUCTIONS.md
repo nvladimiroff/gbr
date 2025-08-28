@@ -28,7 +28,7 @@
  - [X] CALL
  - [X] PUSH
  - [ ] RST
- - [ ] PREFIX
+ - [X] PREFIX
  - [X] DI
  - [X] EI
  - [X] RETI
@@ -41,9 +41,9 @@
  - [ ] SRA
  - [ ] SWAP
  - [ ] SRL
- - [ ] BIT
- - [ ] RES
- - [ ] SET
+ - [X] BIT
+ - [X] RES
+ - [X] SET
 
 _*: needs a test_
 

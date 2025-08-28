@@ -343,4 +343,23 @@ class CPUTest < Minitest::Test
     assert_equal(0b0001_0000, @gb.a)
   end
 
+  def test_reset_bit
+    run_program do
+      ld a, 0xFF
+      res 4, a
+    end
+
+    assert_equal(0b1110_1111, @gb.a)
+  end
+
+
+  def test_test_bit
+    run_program do
+      ld a, 0b1110_1111
+      bit 4, a
+    end
+
+    assert_equal(true, @gb.zero_flag)
+  end
+
 end
