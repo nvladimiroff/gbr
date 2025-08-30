@@ -102,7 +102,7 @@ module CPU::Instructions
 
       assign(dest, result)
 
-      self.zero_flag = result
+      self.zero_flag = result == 0
       self.subtract_flag = false
       self.carry_flag = false
       self.half_carry_flag = true
@@ -116,7 +116,21 @@ module CPU::Instructions
 
       assign(dest, result)
 
-      self.zero_flag = result
+      self.zero_flag = result == 0
+      self.subtract_flag = false
+      self.carry_flag = false
+      self.half_carry_flag = false
+    end
+
+
+    def xor(dest, src)
+      dest_value = load(dest)
+      src_value = load(src)
+      result = dest_value ^ src_value
+
+      assign(dest, result)
+
+      self.zero_flag = result == 0
       self.subtract_flag = false
       self.carry_flag = false
       self.half_carry_flag = false
