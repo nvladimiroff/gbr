@@ -6,7 +6,7 @@
  - [ ] RLCA
  - [X] ADD
  - [ ] RRCA
- - [ ] RRA
+ - [X] RRA
  - [X] JR
  - [ ] RLA
  - [ ] STOP
@@ -20,7 +20,7 @@
  - [X] SBC*
  - [X] AND
  - [X] OR
- - [ ] XOR
+ - [X] XOR
  - [ ] CP
  - [X] RET
  - [X] POP

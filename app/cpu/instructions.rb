@@ -284,4 +284,13 @@ module CPU::Instructions
       assign(dst, value)
     end
 
+
+    def rra
+      new_value = a >> 1
+      new_value |= self.carry_flag ? 0x80 : 0x00
+
+      self.carry_flag = a & 0x80 == 0x80
+      self.a = new_value
+    end
+
 end
