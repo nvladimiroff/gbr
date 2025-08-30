@@ -13,14 +13,15 @@ class Gameboy
     @sp = 0xfffe
     @ticks = 0
 
-    @a = 0
+    # DMG initial values
+    @a = 0x1
     @b = 0
-    @c = 0
-    @d = 0
+    @c = 0x13
+    @d = 0xD8
     @e = 0
     @f = 0
-    @h = 0
-    @l = 0
+    @h = 0x1
+    @l = 0x4D
 
     @halted = false
     @ime = true
@@ -85,6 +86,7 @@ class Gameboy
     end
   rescue => e
     $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
+    raise
   end
 
 
