@@ -2,8 +2,13 @@ class App
 
   def run
     rom = File.read(ARGV[0]).bytes
-    cpu = CPU.new(rom)
-    cpu.run
+    gb = Gameboy.new(rom)
+
+    loop do
+      gb.step
+    rescue
+      break
+    end
   end
 
 
