@@ -321,4 +321,10 @@ module CPU::Instructions
       self.half_carry_flag = false
     end
 
+
+    def stop(*args)
+      dump_state
+      # Stop is confusing, but no licensed game uses it.
+    end
+
 end
