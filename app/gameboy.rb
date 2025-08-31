@@ -3,6 +3,7 @@ class Gameboy
   include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions
 
   attr_reader(:mmu)
+  attr_accessor(:sp)
   reg_8_bit(:a, :b, :c, :d, :e, :f, :h, :l)
   reg_16_bit(:af, :bc, :de, :hl)
 
