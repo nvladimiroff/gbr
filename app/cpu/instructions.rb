@@ -291,6 +291,10 @@ module CPU::Instructions
 
       self.carry_flag = a & 0x80 == 0x80
       self.a = new_value
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.half_carry_flag = false
     end
 
 
@@ -303,6 +307,18 @@ module CPU::Instructions
       self.subtract_flag = true
       self.carry_flag = src_value > dst_value
       self.half_carry_flag = (dst_value & 0xF) - (src_value & 0xF) > 0xF;
+    end
+
+
+    def rlca
+      new_value = a >> 1
+
+      self.carry_flag = a & 0x80 == 0x80
+      self.a = new_value
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.half_carry_flag = false
     end
 
 end
