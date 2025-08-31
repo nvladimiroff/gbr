@@ -323,8 +323,15 @@ module CPU::Instructions
 
 
     def stop(*args)
-      dump_state
+      #dump_state
       # Stop is confusing, but no licensed game uses it.
+    end
+
+
+    def rst(address)
+      @sp -= 2
+      @mmu.write_word(@sp, @pc)
+      @pc = address
     end
 
 end

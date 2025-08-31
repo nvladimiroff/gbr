@@ -6,8 +6,6 @@ class App
 
     loop do
       gb.step
-    rescue
-      break
     end
   end
 
