@@ -293,4 +293,16 @@ module CPU::Instructions
       self.a = new_value
     end
 
+
+    def cp(dest, src)
+      src_value = load(src)
+      dst_value = load(dest)
+      new_value = dst_value - src_value
+
+      self.zero_flag = new_value == 0
+      self.subtract_flag = true
+      self.carry_flag = src_value > dst_value
+      self.half_carry_flag = (dst_value & 0xF) - (src_value & 0xF) > 0xF;
+    end
+
 end

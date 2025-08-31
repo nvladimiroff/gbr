@@ -41,6 +41,8 @@ class CPUTest < Minitest::Test
 
   def test_ld_write_mem
     run_program do
+      ld b, 0x00
+      ld c, 0x00
       ld a, 0xFF
       ld [bc], a
     end
@@ -360,6 +362,21 @@ class CPUTest < Minitest::Test
     end
 
     assert_equal(true, @gb.zero_flag)
+  end
+
+
+  def test_compare
+    run_program do
+      ld a, 0xFF
+      ld b, 0xFF
+      cp a, b
+      jr z, 0x2
+      ld c, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0xFF, @gb.b)
+    refute_equal(0xFF, @gb.c)
   end
 
 end
