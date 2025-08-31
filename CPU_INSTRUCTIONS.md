@@ -3,13 +3,13 @@
  - [X] LD
  - [X] INC
  - [X] DEC*
- - [ ] RLCA
+ - [X] RLCA
  - [X] ADD
  - [ ] RRCA
  - [X] RRA
  - [X] JR
  - [ ] RLA
- - [ ] STOP
+ - [X] STOP
  - [ ] DAA
  - [ ] CPL
  - [ ] SCF
@@ -21,7 +21,7 @@
  - [X] AND
  - [X] OR
  - [X] XOR
- - [ ] CP
+ - [X] CP
  - [X] RET
  - [X] POP
  - [X] JP
