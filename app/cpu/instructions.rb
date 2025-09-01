@@ -111,7 +111,7 @@ module CPU::Instructions
 
     def or_(dest, src)
       dest_value = load(dest)
-      src_value = load(dest)
+      src_value = load(src)
       result = dest_value | src_value
 
       assign(dest, result)
@@ -164,20 +164,20 @@ module CPU::Instructions
 
 
     def di
-      @ime = false
+      @interrupts.ime = false
     end
 
 
     def ei
-      @ime = true
+      @interrupts.ime = true
     end
 
 
     def call(*args)
-      if condition_met?(args.first)
-        location = args.length == 1 ? args.first : args.second
-        address = load(location)
+      location = args.length == 1 ? args.first : args.second
+      address = load(location)
 
+      if condition_met?(args.first)
         @sp -= 2
         @mmu.write_word(@sp, @pc)
         @pc = address

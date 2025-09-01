@@ -9,7 +9,10 @@ class Gameboy
 
 
   def initialize(rom)
-    @mmu = MMU.new(rom)
+    @cartridge = Cartridge.new(rom)
+    @interrupts = Interrupts.new
+    @ppu = {}
+    @mmu = MMU.new(@cartridge, @ppu, @interrupts)
     @pc = 0x0100
     @sp = 0xfffe
     @ticks = 0
@@ -25,25 +28,11 @@ class Gameboy
     @l = 0x4D
 
     @halted = false
-    @ime = true
   end
 
 
-  def send_interrupt(type)
-    return unless interrupt_enabled(type)
-
-    case type
-    when :vblank
-      @mmu[0xFF0F] |= 0x01
-    when :lcd_stat
-      @mmu[0xFF0F] |= 0x02
-    when :timer_overflow
-      @mmu[0xFF0F] |= 0x04
-    when :serial
-      @mmu[0xFF0F] |= 0x08
-    when :joypad
-      @mmu[0xFF0F] |= 0x10
-    end
+  def fire_interrupt(type)
+    @interrupts.fire(type)
   end
 
 
@@ -73,9 +62,11 @@ class Gameboy
 
 
   def step
-    pending_interrupts.each do |interrupt|
-      next unless @ime
-      handle_interrupt(interrupt)
+    @interrupts.handle do |type, addr|
+      @sp -= 2
+      @mmu.write_word(@sp, @pc)
+      @pc = addr
+      @halted = false
     end
 
     unless @halted
@@ -99,65 +90,6 @@ class Gameboy
       raise "Unimplemented opcode" unless instructions
 
       send(*instructions)
-    end
-
-
-    def pending_interrupts
-      interrupts = []
-
-      if @mmu[0xFF0F] & 0x01 == 1
-        interrupts << :vblank
-      end
-
-      if @mmu[0xFF0F] & 0x02 == 1
-        interrupts << :lcd_stat
-      end
-
-      if @mmu[0xFF0F] & 0x04 == 1
-        interrupts << :timer_overflow
-      end
-
-      if @mmu[0xFF0F] & 0x08 == 1
-        interrupts << :serial
-      end
-
-      if @mmu[0xFF0F] & 0x10 == 1
-        interrupts << :joypad
-      end
-
-      interrupts
-    end
-
-
-    def interrupt_enabled(type)
-      true
-    end
-
-
-    def handle_interrupt(type)
-      case type
-      when :vblank
-        addr = 0x40
-        @mmu[0xFF0F] &= 0b1111_1110
-      when :lcd_stat
-        addr = 0x48
-        @mmu[0xFF0F] &= 0b1111_1101
-      when :timer_overflow
-        addr = 0x50
-        @mmu[0xFF0F] &= 0b1111_1011
-      when :serial
-        addr = 0x58
-        @mmu[0xFF0F] &= 0b1111_0111
-      when :joypad
-        addr = 0x60
-        @mmu[0xFF0F] &= 0b1110_1111
-      end
-
-      @sp -= 2
-      @mmu.write_word(@sp, @pc)
-      @pc = addr
-      @ime = false
-      @halted = false
     end
 
 end

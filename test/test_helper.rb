@@ -4,46 +4,53 @@ require 'minitest/autorun'
 class Minitest::Test
 
   def setup
-    @gb = Gameboy.new([])
+    @rom = Array.new(0x8000, 0)
+    @prev_inst = nil
+    @gb = nil
   end
 
 
-  def set_proc(addr, &block)
-    handler = Asm.compile(&block)
-    map_code(handler.binary, start: addr)
-  end
-
-
-  def set_interrupt_handler(...)
-    set_proc(...)
-  end
-
-
-  def load_program(&block)
+  def load_program(**opts, &block)
     program = Asm.compile(&block)
-    map_code(program.binary, start: 0x100)
-
-    program
+    map_code(program.binary, at: opts[:at] || 0x0100)
   end
 
 
-  def run_program(**opts, &block)
-    program = load_program(&block)
+  def run_program(&block)
+    load_program(&block)
 
-    limit = opts[:limit] || program.length
-    limit.times do
+    @gb = Gameboy.new(@rom)
+    loop do
       @gb.step
+
+      # Run until NOP twice
+      if @gb.instance_variable_get(:@op) == 0 && @prev_inst == 0
+        break
+      end
+      @prev_inst = @gb.instance_variable_get(:@op)
     end
+  end
+
+
+  def step
+    @gb ||= Gameboy.new(@rom)
+    @gb.step
+  end
+
+
+  def fire_interrupt(...)
+    @gb ||= Gameboy.new(@rom)
+    @gb.fire_interrupt(...)
   end
 
 
   private
 
     def map_code(program, **opts)
-      start = opts[:start] || 0
+      start = opts[:at]
 
       program.each_with_index { |byte, i|
-        @gb.mmu[start+i] = byte
+        @rom[start+i] = byte
       }
     end
 
