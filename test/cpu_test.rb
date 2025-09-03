@@ -339,16 +339,20 @@ class CPUTest < Minitest::Test
   end
 
 
-  def test_ldh_addr
+  def test_cp_doesnt_turn_into_sub
     run_program do
       ld a, 0xFF
       ldh [0xFF40], a
       ld a, 0
       ldh a, [0xFF40]
+      cp a, 0x94
+      jr nz, 0x01
+      ld b, 0xFF
     end
 
     assert_equal(0xFF, @gb.mmu[0xFF40])
     assert_equal(0xFF, @gb.a)
+    refute_equal(0xFF, @gb.b)
   end
 
 end
