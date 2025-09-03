@@ -300,4 +300,42 @@ class CPUTest < Minitest::Test
     refute_equal(0xFF, @gb.c)
   end
 
+
+  def test_ldd
+    run_program do
+      ld hl, 0x8000
+      ld a, 0xFF
+      ldd [hl], a
+    end
+
+    assert_equal(0x7FFF, @gb.hl)
+    assert_equal(0xFF, @gb.mmu[0x8000])
+  end
+
+
+  def test_ldi
+    run_program do
+      ld hl, 0x8000
+      ld a, 0xFF
+      ldi [hl], a
+    end
+
+    assert_equal(0x8001, @gb.hl)
+    assert_equal(0xFF, @gb.mmu[0x8000])
+  end
+
+
+  def test_ldh
+    run_program do
+      ld hl, 0xFF80
+      ld [hl], 0xFF
+      ld c, 0x80
+
+      ldh a, [c]
+    end
+
+    assert_equal(0xFF, @gb.mmu[0xFF80])
+    assert_equal(0xFF, @gb.a)
+  end
+
 end

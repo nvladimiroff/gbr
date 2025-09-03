@@ -346,4 +346,34 @@ module CPU::Instructions
     def rrca
     end
 
+
+    def ldh(dest, src)
+      src_value = if src.is_a?(Array)
+        mmu[load(src[0])+0xFF00]
+      else
+        load(src)
+      end
+
+      if dest.is_a?(Array)
+        mmu[load(dest[0]) + 0xFF00] = src_value
+      else
+        assign(dest, src_value)
+      end
+
+
+      assign(dest, src_value)
+    end
+
+
+    def ldd(dest, src)
+      ld(dest, src)
+      self.hl = hl - 1
+    end
+
+
+    def ldi(dest, src)
+      ld(dest, src)
+      self.hl = hl + 1
+    end
+
 end
