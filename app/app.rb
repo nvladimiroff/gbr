@@ -2,7 +2,7 @@ class App
 
   def run
     rom = File.read(ARGV[0]).bytes
-    ppu = PPU.new
+    ppu = RaylibPPU.new
     gb = Gameboy.new(rom, ppu)
     ppu.open_window
 

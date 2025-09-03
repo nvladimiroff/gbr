@@ -63,7 +63,7 @@ module CPU::Instructions
 
 
     def reg_is_16bit?(reg)
-      reg.to_s.length > 1
+      reg.to_s.length > 1 && reg != :n8
     end
 
 
@@ -80,6 +80,12 @@ module CPU::Instructions
       else
         true
       end
+    end
+
+
+    def to_signed_byte(byte)
+      byte &= 0xff
+      byte > 127 ? byte - 256 : byte
     end
 
 
@@ -138,16 +144,18 @@ module CPU::Instructions
 
 
     def jr(*args)
-      increment = args.length == 1 ? args.first : args.second
+      location = args.length == 1 ? args.first : args.second
+      increment = to_signed_byte(load(location))
 
-      @pc = load(increment) + @pc if condition_met?(args.first)
+      @pc = increment + @pc if condition_met?(args.first)
     end
 
 
     def jp(*args)
-      address = args.length == 1 ? args.first : args.second
+      location = args.length == 1 ? args.first : args.second
+      address = load(location)
 
-      @pc = load(address) if condition_met?(args.first)
+      @pc = address if condition_met?(args.first)
     end
 
 
@@ -332,6 +340,10 @@ module CPU::Instructions
       @sp -= 2
       @mmu.write_word(@sp, @pc)
       @pc = address
+    end
+
+
+    def rrca
     end
 
 end

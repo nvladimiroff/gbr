@@ -8,23 +8,23 @@ class Gameboy
   reg_16_bit(:af, :bc, :de, :hl)
 
 
-  def initialize(rom, ppu)
+  def initialize(rom, ppu = nil)
     @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
-    @ppu = ppu
+    @ppu = ppu || PPU.new
     @mmu = MMU.new(@cartridge, @ppu, @interrupts)
     @pc = 0x0100
     @sp = 0xfffe
     @ticks = 0
 
     # DMG initial values
-    @a = 0x1
-    @b = 0
+    @a = 0x01
+    @b = 0x00
     @c = 0x13
-    @d = 0xD8
-    @e = 0
-    @f = 0
-    @h = 0x1
+    @d = 0x00
+    @e = 0xD8
+    @f = 0xB0
+    @h = 0x01
     @l = 0x4D
 
     @halted = false

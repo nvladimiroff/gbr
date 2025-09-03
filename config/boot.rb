@@ -12,7 +12,8 @@ loader.push_dir($ROOT.join('app').to_s)
 loader.inflector.inflect(
   'cpu' => "CPU",
   'mmu' => "MMU",
-  'ppu' => 'PPU'
+  'ppu' => 'PPU',
+  'raylib_ppu' => 'RaylibPPU'
 )
 loader.setup
 SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)

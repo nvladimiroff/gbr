@@ -5,13 +5,6 @@ class PPU
   WIDTH = 160
   HEIGHT = 144
   SCALE = 5
-  COLOR_MAP = {
-    0 => Raylib::RAYWHITE,
-    1 => Raylib::LIGHTGRAY,
-    2 => Raylib::DARKGRAY,
-    3 => Raylib::BLACK
-  }
-
 
   def initialize
     @mode = :draw
@@ -28,12 +21,6 @@ class PPU
     # Complicated sprite stuff
 
     @ly = 0
-  end
-
-
-  def open_window
-    Raylib.load_lib('libraylib')
-    Raylib.InitWindow(WIDTH*SCALE, HEIGHT*SCALE, 'GBR')
   end
 
 
@@ -87,28 +74,17 @@ class PPU
 
 
     def render
-      if Raylib.WindowShouldClose
-        Raylib.CloseWindow
-        exit
-      end
-
-      Raylib.BeginDrawing
-        Raylib.ClearBackground(Raylib::RAYWHITE)
-        draw_all
-      Raylib.EndDrawing
-    end
-
-
-    def draw_all
-      # Background
-      y = 0
-      (0x1800..0x1BFF).each_slice(32) do |row|
-        x = 0
-        row.each do |addr|
-          draw_tile(x, y, @vram[addr])
-          x += 1
+      in_render_loop do
+        # Background
+        y = 0
+        (0x1800..0x1BFF).each_slice(32) do |row|
+          x = 0
+          row.each do |addr|
+            draw_tile(x, y, @vram[addr])
+            x += 1
+          end
+          y += 1
         end
-        y += 1
       end
     end
 
@@ -127,8 +103,13 @@ class PPU
 
 
     def draw_pixel(x, y, byte_color)
-      color = COLOR_MAP[byte_color]
-      Raylib.DrawRectangle(x * SCALE, y * SCALE, SCALE, SCALE, color)
+      # Override in subclasses
+    end
+
+
+    def in_render_loop
+      # Override in subclasses
+      yield
     end
 
 end

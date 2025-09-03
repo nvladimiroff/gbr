@@ -145,6 +145,19 @@ class CPUTest < Minitest::Test
   end
 
 
+  def test_backwards_jr
+    run_program do
+      ld b, 0x10
+      dec b
+      jr nz, 0xFD
+      ld a, 0xFF
+    end
+
+    assert_equal(0xFF, @gb.a)
+    assert_equal(0x00, @gb.b)
+  end
+
+
   def test_cond_jp
     run_program do
       ld a, 0x00
