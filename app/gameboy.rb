@@ -8,10 +8,10 @@ class Gameboy
   reg_16_bit(:af, :bc, :de, :hl)
 
 
-  def initialize(rom)
+  def initialize(rom, ppu)
     @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
-    @ppu = {}
+    @ppu = ppu
     @mmu = MMU.new(@cartridge, @ppu, @interrupts)
     @pc = 0x0100
     @sp = 0xfffe
@@ -49,7 +49,7 @@ class Gameboy
       end
 
       out.section("INTERRUPTS") do
-        out.line("Pending interrupts: #{pending_interrupts}")
+        out.line("Pending interrupts: #{@interrupts.pending_byte}")
       end
 
       out.section("MEMORY") do
@@ -76,9 +76,11 @@ class Gameboy
     else
       @ticks += 4
     end
+
+    @ppu.step(by: 4)
   rescue => e
     $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
-    raise
+    #raise
   end
 
 

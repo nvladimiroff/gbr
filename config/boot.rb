@@ -11,7 +11,8 @@ loader = Zeitwerk::Loader.new
 loader.push_dir($ROOT.join('app').to_s)
 loader.inflector.inflect(
   'cpu' => "CPU",
-  'mmu' => "MMU"
+  'mmu' => "MMU",
+  'ppu' => 'PPU'
 )
 loader.setup
 SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)

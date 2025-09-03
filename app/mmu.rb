@@ -15,7 +15,7 @@ class MMU
     when 0x0..0x7FFF
       @cartridge[addr]
     when 0x8000..0x9FFF
-      # PPU
+      @ppu[addr - 0x8000]
     when 0xA000..0xBFFF
       @eram[addr - 0xA000]
     when 0xC000..0xDFFF
@@ -24,10 +24,12 @@ class MMU
       # WRAM (Shadow)
       @wram[addr - 0xE000]
     when 0xFE00..0xFE9F
+      0xFF
       # Sprites
     when 0xFF0F # Interrupts
       @interrupts.pending_byte
     when 0xFF00..0xFF7F
+      0xFF
       # Other IO I haven't implemented yet.
     when 0xFF80..0xFFFF
       @zram[addr - 0xFF80]
@@ -38,9 +40,9 @@ class MMU
   def []=(addr, value)
     case addr
     when 0x0..0x7FFF
-      raise ReadOnlyMemoryError.new
+      #raise ReadOnlyMemoryError.new
     when 0x8000..0x9FFF
-      # PPU
+      @ppu[addr - 0x8000] = value
     when 0xA000..0xBFFF
       @eram[addr - 0xA000] = value
     when 0xC000..0xDFFF

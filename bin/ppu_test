@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+require_relative '../config/boot'
+
+rom = Array.new(0x8000, 0)
+binary = Assembler.compile do
+  # Load a tile with a single row, and leave the rest white.
+  ld hl, 0x8002
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  ld [hl], 0xA5
+  inc hl
+  ld [hl], 0xC3
+  inc hl
+  halt
+end
+binary.map_to(rom, at: 0x0100)
+
+ppu = PPU.new
+gb = Gameboy.new(rom, ppu)
+
+ppu.open_window
+loop { gb.step }
