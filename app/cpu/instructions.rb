@@ -348,14 +348,14 @@ module CPU::Instructions
 
 
     def ldh(dest, src)
-      src_value = if src.is_a?(Array)
-        mmu[load(src[0])+0xFF00]
+      src_value = if src == [:c]
+        mmu[load(:c)+0xFF00]
       else
         load(src)
       end
 
-      if dest.is_a?(Array)
-        mmu[load(dest[0]) + 0xFF00] = src_value
+      if dest == [:c]
+        mmu[load(:c) + 0xFF00] = src_value
       else
         assign(dest, src_value)
       end

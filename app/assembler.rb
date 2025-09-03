@@ -68,9 +68,12 @@ class Assembler
       !%i(bit set res).include?(instruction)
     end
 
+
     def map_ints(args)
       args.map do |a|
-        if a.is_a?(Integer)
+        if a.is_a?(Array) && a[0].is_a?(Integer)
+          a[0] > 0xFF ? [:n16] : [:n8]
+        elsif a.is_a?(Integer)
           a > 0xFF ? :n16 : :n8
         else
           a

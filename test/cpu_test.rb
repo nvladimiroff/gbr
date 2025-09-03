@@ -338,4 +338,17 @@ class CPUTest < Minitest::Test
     assert_equal(0xFF, @gb.a)
   end
 
+
+  def test_ldh_addr
+    run_program do
+      ld a, 0xFF
+      ldh [0xFF40], a
+      ld a, 0
+      ldh a, [0xFF40]
+    end
+
+    assert_equal(0xFF, @gb.mmu[0xFF40])
+    assert_equal(0xFF, @gb.a)
+  end
+
 end

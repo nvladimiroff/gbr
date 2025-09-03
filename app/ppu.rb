@@ -7,7 +7,7 @@ class PPU
   SCALE = 5
 
   def initialize
-    @mode = :draw
+    @mode = :oam
     @clock = 0
     @pixels = Array.new(WIDTH * HEIGHT, 1)
     @vram = Array.new(0x2000, 0)
@@ -76,14 +76,8 @@ class PPU
     def render
       in_render_loop do
         # Background
-        y = 0
-        (0x1800..0x1BFF).each_slice(32) do |row|
-          x = 0
-          row.each do |addr|
-            draw_tile(x, y, @vram[addr])
-            x += 1
-          end
-          y += 1
+        (0x1800..0x1BFF).each_with_index do |addr, i|
+          draw_tile(i % 32, (i / 32).floor, @vram[addr])
         end
       end
     end
