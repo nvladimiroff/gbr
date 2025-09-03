@@ -72,6 +72,10 @@ class Gameboy
     unless @halted
       @op = @mmu[@pc]
       @pc += 1
+      $logger.debug("Running instruction", :payload => {
+        :op => MAPPING[@op],
+        :pc => @pc.to_hex
+      })
       decode_and_execute(@op)
     else
       @ticks += 4
