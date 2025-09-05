@@ -193,9 +193,11 @@ module CPU::Instructions
     end
 
 
-    def ret
-      @pc = @mmu.read_word(@sp)
-      @sp += 2
+    def ret(*args)
+      if condition_met?(args.first)
+        @pc = @mmu.read_word(@sp)
+        @sp += 2
+      end
     end
 
 
