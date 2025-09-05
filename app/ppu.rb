@@ -1,6 +1,6 @@
 class PPU
 
-  attr_reader(:pixels)
+  attr_reader(:pixels, :ly)
 
   WIDTH = 160
   HEIGHT = 144
@@ -34,6 +34,7 @@ class PPU
     when :draw
       # Duration: 174?
       render
+      @ly += 1
       transition(:hblank)
       # draw scanline
     when :hblank
@@ -57,6 +58,7 @@ class PPU
 
 
   def []=(addr, value)
+    $stderr.write("WRITING VRAM #{addr}=#{value}")
     @vram[addr] = value
   end
 
@@ -69,7 +71,7 @@ class PPU
 
 
     def last_line?
-      true
+      @ly == 144
     end
 
 

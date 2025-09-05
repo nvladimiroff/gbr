@@ -28,6 +28,8 @@ class MMU
       # Sprites
     when 0xFF0F # Interrupts
       @interrupts.pending_byte
+    when 0xFF44
+      @ppu.ly
     when 0xFF00..0xFF7F
       0xFF
       # Other IO I haven't implemented yet.
