@@ -2,12 +2,13 @@ class App
 
   def run
     rom = File.read(ARGV[0]).bytes
-    ppu = RaylibPPU.new
-    gb = Gameboy.new(rom, ppu)
-    ppu.open_window
+    gb = Gameboy.new(rom)
+    renderer = Renderer.new(gb.ppu)
+    renderer.open_window
 
     loop do
       gb.step
+      renderer.render_frame
     end
   end
 

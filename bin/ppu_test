@@ -33,8 +33,11 @@ binary = Assembler.compile do
 end
 binary.map_to(rom, at: 0x0100)
 
-ppu = RaylibPPU.new
-gb = Gameboy.new(rom, ppu)
+gb = Gameboy.new(rom)
+renderer = Renderer.new(gb.ppu)
+renderer.open_window
 
-ppu.open_window
-loop { gb.step }
+loop {
+  gb.step
+  renderer.render_frame
+}

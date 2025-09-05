@@ -19,7 +19,7 @@ class Minitest::Test
   def run_program(&block)
     load_program(&block)
 
-    @gb = Gameboy.new(@rom, PPU.new)
+    @gb = Gameboy.new(@rom)
     loop do
       @gb.step
 
@@ -33,13 +33,13 @@ class Minitest::Test
 
 
   def step
-    @gb ||= Gameboy.new(@rom, PPU.new)
+    @gb ||= Gameboy.new(@rom)
     @gb.step
   end
 
 
   def fire_interrupt(...)
-    @gb ||= Gameboy.new(@rom, PPU.new)
+    @gb ||= Gameboy.new(@rom)
     @gb.fire_interrupt(...)
   end
 

@@ -2,16 +2,16 @@ class Gameboy
 
   include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions
 
-  attr_reader(:mmu)
+  attr_reader(:mmu, :ppu)
   attr_accessor(:sp)
   reg_8_bit(:a, :b, :c, :d, :e, :f, :h, :l)
   reg_16_bit(:af, :bc, :de, :hl)
 
 
-  def initialize(rom, ppu = nil)
+  def initialize(rom)
     @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
-    @ppu = ppu || PPU.new
+    @ppu = PPU.new
     @mmu = MMU.new(@cartridge, @ppu, @interrupts)
     @pc = 0x0100
     @sp = 0xfffe
@@ -72,10 +72,10 @@ class Gameboy
     unless @halted
       @op = @mmu[@pc]
       @pc += 1
-      $logger.debug("Running instruction", :payload => {
-        :op => MAPPING[@op],
-        :pc => @pc.to_hex
-      })
+      # $logger.debug("Running instruction", :payload => {
+      #   :op => MAPPING[@op],
+      #   :pc => @pc.to_hex
+      # })
       decode_and_execute(@op)
     else
       @ticks += 4
