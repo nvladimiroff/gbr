@@ -342,11 +342,11 @@ class CPUTest < Minitest::Test
   def test_cp_doesnt_turn_into_sub
     run_program do
       ld a, 0xFF
-      ldh [0xFF40], a
+      ldh [0x40], a
       ld a, 0
-      ldh a, [0xFF40]
+      ldh a, [0x40]
       cp a, 0x94
-      jr nz, 0x01
+      jr nz, 0x02
       ld b, 0xFF
     end
 

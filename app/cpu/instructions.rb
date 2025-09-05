@@ -348,20 +348,17 @@ module CPU::Instructions
 
 
     def ldh(dest, src)
-      src_value = if src == [:c]
-        mmu[load(:c)+0xFF00]
-      else
-        load(src)
+      src_value = case src
+      when :a then a
+      when [:c] then mmu[0xFF00 + c]
+      when [:n8] then mmu[0xFF00 + n8]
       end
 
-      if dest == [:c]
-        mmu[load(:c) + 0xFF00] = src_value
-      else
-        assign(dest, src_value)
+      case dest
+      when :a then self.a = src_value
+      when [:c] then mmu[0xFF00 + c] = src_value
+      when [:n8] then mmu[0xFF00 + n8] = src_value
       end
-
-
-      assign(dest, src_value)
     end
 
 
