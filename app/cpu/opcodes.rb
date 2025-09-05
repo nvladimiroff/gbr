@@ -246,7 +246,7 @@ module CPU::Opcodes
     0xE7 => (rst 0x20),
     0xE8 => (add sp, n8),
     0xE9 => (jp hl),
-    0xEA => (ld [n8], a),
+    0xEA => (ld [n16], a),
     0xEB => (illegal_eb),
     0xEC => (illegal_ec),
     0xED => (illegal_ed),
