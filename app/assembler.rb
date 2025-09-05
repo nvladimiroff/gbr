@@ -21,25 +21,7 @@ class Assembler
     return sym if VALUES.include?(sym)
 
     key = [sym] + (encode_next_byte?(sym) ? map_ints(args) : args)
-    opcode = @@opcodes[key]
-    instructions = []
-
-    if opcode == nil
-      opcode = @@cb_opcodes[key]
-      instructions << 0xCB if opcode
-    end
-
-    if opcode == nil
-      raise "Missing opcode: #{key}"
-    end
-
-    instructions << opcode
-    instructions << args.last if key.include?(:n8)
-    if key.include?(:n16)
-      instructions += [args.last & 0x00FF, (args.last & 0xFF00) >> 8]
-    end
-
-    @instructions << instructions
+    @instructions << build_instruction(key, args)
   end
 
 
@@ -79,6 +61,39 @@ class Assembler
           a
         end
       end
+    end
+
+
+    def build_instruction(key, args)
+      opcode = @@opcodes[key]
+      i = []
+
+      if opcode == nil
+        opcode = @@cb_opcodes[key]
+        i << 0xCB if opcode
+      end
+
+      if opcode == nil
+        raise "Missing opcode: #{key}"
+      end
+      i << opcode
+
+      key.drop(1).zip(args).each do |k, arg|
+        if k.is_a?(Array)
+          k = k[0]
+          arg = arg[0]
+        end
+
+        if k == :n8
+          i << arg
+        elsif k == :n16
+          i += [arg & 0x00FF, (arg & 0xFF00) >> 8]
+        end
+      end
+
+      $logger.debug('Assembling', :i => i, :key => key, :args => args)
+
+      i
     end
 
 end
