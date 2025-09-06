@@ -113,19 +113,20 @@ class PPU
 
     def render_bg_scanline
       y = @ly + @scy
-      bg_map_row = y / 32
+      tile_row = (y / 8) * 32
 
       WIDTH.times do |pixel|
         x = pixel + @scx
-        bg_map_col = x / 32
-        tile_index = @vram[0x1800 + bg_map_row * 32 + bg_map_col]
+
+        tile_col = x / 8
+        tile_index = @vram[0x1800 + tile_row + tile_col]
 
         line = (y % 8) * 2
 
         byte_1 = @vram[tile_index * 16 + line]
         byte_2 = @vram[tile_index * 16 + line + 1]
 
-        color = byte_1[pixel % 8] + byte_2[pixel % 8]
+        color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
       end
     end
