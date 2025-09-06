@@ -4,11 +4,12 @@ class PPU
 
   WIDTH = 160
   HEIGHT = 144
+  # Borrowed the palette from Gambatte: https://github.com/libretro/gambatte-libretro/blob/13b7af780e9893ae62cc24d567591b5eb6a6dd72/libgambatte/libretro/gbcpalettes.h#L32
   COLOR_MAP = {
-    0 => 0xFFFFFFFF,
-    1 => 0xFFAAAAAA,
-    2 => 0xFF555555,
-    3 => 0xFF000000
+    0 => 0x578200FF,
+    1 => 0x317400FF,
+    2 => 0x005121FF,
+    3 => 0x00420CFF
   }
 
 
@@ -125,7 +126,6 @@ class PPU
         byte_2 = @vram[tile_index * 16 + line + 1]
 
         color = byte_1[pixel % 8] + byte_2[pixel % 8]
-        #puts "COLO #{color} FROM #{tile_index} IT'S #{byte_1.to_hex} #{byte_2.to_hex} at #{pixel}x#{@ly}"
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
       end
     end
