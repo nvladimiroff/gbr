@@ -30,14 +30,16 @@ class MMU
       # Unusable
       0xFF
     when 0xFF0F # Interrupts
-      @interrupts.pending_byte
+      @interrupts[0xFF0F]
     when 0xFF44
       @ppu.ly
     when 0xFF00..0xFF7F
       0xFF
       # Other IO I haven't implemented yet.
-    when 0xFF80..0xFFFF
+    when 0xFF80..0xFFFE
       @zram[addr - 0xFF80]
+    when 0xFFFF
+      @interrupts[0xFFFF]
     end
   end
 
@@ -60,11 +62,13 @@ class MMU
     when 0xFEA0..0xFEFF
       # Unusable
     when 0xFF0F
-       # Interrupts
+      @interrupts[0xFF0F] = value
     when 0xFF00..0xFF7F
       # Other IO I haven't implemented yet.
-    when 0xFF80..0xFFFF
+    when 0xFF80..0xFFFE
       @zram[addr - 0xFF80] = value
+    when 0xFFFF
+      @interrupts[0xFF0F] = value
     end
   end
 
