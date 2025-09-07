@@ -330,7 +330,7 @@ module CPU::Instructions
 
 
     def rlca
-      new_value = a >> 1
+      new_value = a << 1
 
       self.carry_flag = a & 0x80 == 0x80
       self.a = new_value
@@ -342,7 +342,6 @@ module CPU::Instructions
 
 
     def stop(*args)
-      #dump_state
       # Stop is confusing, but no licensed game uses it.
     end
 
@@ -355,6 +354,14 @@ module CPU::Instructions
 
 
     def rrca
+      new_value = a >> 1
+
+      self.carry_flag = a & 0x01 == 0x01
+      self.a = new_value
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.half_carry_flag = false
     end
 
 
