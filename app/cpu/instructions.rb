@@ -414,4 +414,11 @@ module CPU::Instructions
       self.carry_flag = false
     end
 
+
+    def scf
+      self.subtract_flag = false
+      self.half_carry_flag = false
+      self.carry_flag = true
+    end
+
 end
