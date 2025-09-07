@@ -15,7 +15,8 @@ class MMU
     when 0x0..0x7FFF
       @cartridge[addr]
     when 0x8000..0x9FFF
-      @ppu[addr - 0x8000]
+      # VRAM
+      @ppu[addr]
     when 0xA000..0xBFFF
       @eram[addr - 0xA000]
     when 0xC000..0xDFFF
@@ -25,7 +26,7 @@ class MMU
       @wram[addr - 0xE000]
     when 0xFE00..0xFE9F
       # Sprites
-      0xFF
+      @ppu[addr]
     when 0xFEA0..0xFEFF
       # Unusable
       0xFF
@@ -47,9 +48,9 @@ class MMU
   def []=(addr, value)
     case addr
     when 0x0..0x7FFF
-      #raise ReadOnlyMemoryError.new
+      # Ignore it. You can't write to the ROM.
     when 0x8000..0x9FFF
-      @ppu[addr - 0x8000] = value
+      @ppu[addr] = value
     when 0xA000..0xBFFF
       @eram[addr - 0xA000] = value
     when 0xC000..0xDFFF
@@ -59,6 +60,7 @@ class MMU
       @wram[addr - 0xE000] = value
     when 0xFE00..0xFE9F
       # Sprites
+      @ppu[addr] = value
     when 0xFEA0..0xFEFF
       # Unusable
     when 0xFF0F

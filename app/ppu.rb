@@ -20,14 +20,13 @@ class PPU
     @disabled = false
     @pixels = Array.new(WIDTH*HEIGHT, 0)
     @vram = Array.new(0x2000, 0)
+    @oam = Array.new(0xA0, 0xFF)
 
     @scx = 0
     @scy = 0
 
     @wx = 0
     @wy = 0
-
-    # Complicated sprite stuff
 
     @ly = 0
   end
@@ -71,12 +70,27 @@ class PPU
 
 
   def [](addr)
-    @vram[addr]
+    case addr
+    when 0x8000..0x9FFF
+      # VRAM
+      @vram[addr - 0x8000]
+    when 0xFE00..0xFE9F
+      # Sprites
+      @oam[addr - 0xFE00]
+    end
   end
 
 
+
   def []=(addr, value)
-    @vram[addr] = value
+    case addr
+    when 0x8000..0x9FFF
+      # VRAM
+      @vram[addr - 0x8000] = value
+    when 0xFE00..0xFE9F
+      # Sprites
+      @oam[addr - 0xFE00] = value
+    end
   end
 
 
@@ -109,6 +123,7 @@ class PPU
 
     def render_scanline
       render_bg_scanline
+      render_sprite_scanline
     end
 
 
@@ -130,6 +145,40 @@ class PPU
         color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
       end
+    end
+
+
+    def render_sprite_scanline
+      40.times do |sprite_index|
+        sprite = read_sprite(sprite_index)
+
+        # Is this sprite on the current scanline?
+        if @ly >= sprite[:y] && @ly < (sprite[:y] + 8)
+          line = @ly - sprite[:y]
+
+          byte_1 = @vram[sprite[:tile] * 16 + line]
+          byte_2 = @vram[sprite[:tile] * 16 + line + 1]
+
+          8.times do |pixel|
+            color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
+            @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
+          end
+        end
+      end
+    end
+
+
+    def read_sprite(index)
+      y = @oam[index * 4] - 16
+      x = @oam[index * 4 + 1] - 8
+      tile = @oam[index * 4 + 2]
+      _attributes = @oam[index * 4 + 3]
+
+      {
+        x:,
+        y:,
+        tile:
+      }
     end
 
 end
