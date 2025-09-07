@@ -8,7 +8,6 @@ class PPUTest < Minitest::Test
       ld a, 0xFF
       ld b, 0x40
 
-      nop
       ldi [hl], a
       dec b
       jr nz, 0xFB
@@ -26,7 +25,6 @@ class PPUTest < Minitest::Test
       ld a, 0x00
       ld b, 0x40
 
-      nop
       ldi [hl], a
       dec b
       jr nz, 0xFB
