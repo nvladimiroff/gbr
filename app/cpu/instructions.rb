@@ -295,16 +295,25 @@ module CPU::Instructions
     end
 
 
-    def rra
-      new_value = a >> 1
+    def rr(dest)
+      dest_value = load(dest)
+      new_value = dest_value >> 1
       new_value |= self.carry_flag ? 0x80 : 0x00
 
-      self.carry_flag = a & 0x80 == 0x80
-      self.a = new_value
+      assign(dest, new_value)
 
-      self.zero_flag = false
+      self.zero_flag = new_value == 0
       self.subtract_flag = false
       self.half_carry_flag = false
+      self.carry_flag = dest_value & 0x80 == 0x80
+    end
+
+
+    def rra
+      rr(:a)
+
+      # this is always false for RRA for whatever reason.
+      self.zero_flag = false
     end
 
 
