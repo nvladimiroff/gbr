@@ -375,4 +375,27 @@ module CPU::Instructions
       self.hl = hl + 1
     end
 
+
+    def cpl
+      self.a = ~a & 0xFF
+
+      self.subtract_flag = true
+      self.half_carry_flag = true
+    end
+
+
+    def swap(dest)
+      dest_value = load(dest)
+      upper = dest_value >> 4
+      lower = dest_value & 0x0F
+      new_value = (lower << 4) | upper
+
+      assign(dest, new_value)
+
+      self.zero_flag = new_value == 0
+      self.subtract_flag = false
+      self.half_carry_flag = false
+      self.carry_flag = false
+    end
+
 end
