@@ -1,33 +1,32 @@
 class Gameboy
 
-  include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions
-
-  attr_reader(:mmu, :ppu)
-  attr_accessor(:sp)
-  reg_8_bit(:a, :b, :c, :d, :e, :f, :h, :l)
-  reg_16_bit(:af, :bc, :de, :hl)
+  attr_reader(:cpu, :mmu, :ppu)
+  delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
 
 
-  def initialize(rom)
+  def initialize(rom, lcd = nil)
+    @lcd = lcd || HeadlessLCD.new
     @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
     @ppu = PPU.new(@interrupts)
     @mmu = MMU.new(@cartridge, @ppu, @interrupts)
-    @pc = 0x0100
-    @sp = 0xfffe
-    @ticks = 0
+    @cpu = CPU.new(@mmu, @interrupts)
+  end
 
-    # DMG initial values
-    @a = 0x01
-    @b = 0x00
-    @c = 0x13
-    @d = 0x00
-    @e = 0xD8
-    @f = 0xB0
-    @h = 0x01
-    @l = 0x4D
 
-    @halted = false
+  def run
+    @lcd.open_window
+
+    loop do
+      step
+    end
+  end
+
+
+  def step
+    @cpu.step
+    @ppu.step(by: @cpu.last_ticks)
+    @lcd.render_frame(@ppu.pixels)
   end
 
 
@@ -40,12 +39,12 @@ class Gameboy
     Console.new.display_until_quit do |out|
       out.section("REGISTERS") do
         out.row(*%w(PC SP A B C D E F H L))
-        out.row(*[@pc, @sp, @a, @b, @c, @d, @e, @f, @h, @l].map(&:to_hex))
+        out.row(*[@cpu.pc, @cpu.sp, @cpu.a, @cpu.b, @cpu.c, @cpu.d, @cpu.e, @cpu.f, @cpu.h, @cpu.l].map(&:to_hex))
       end
 
       out.section("INSTRUCTIONS") do
-        out.line("Last instruction executed: #{MAPPING[@op]}")
-        out.line("Next instruction: #{MAPPING[@mmu[@pc+1]]}")
+        out.line("Last instruction executed: #{MAPPING[@cpu.op]}")
+        out.line("Next instruction: #{MAPPING[@mmu[@cpu.pc+1]]}")
       end
 
       out.section("INTERRUPTS") do
@@ -59,43 +58,5 @@ class Gameboy
       end
     end
   end
-
-
-  def step
-    @interrupts.handle do |type, addr|
-      @sp -= 2
-      @mmu.write_word(@sp, @pc)
-      @pc = addr
-      @halted = false
-    end
-
-    unless @halted
-      @op = @mmu[@pc]
-      @pc += 1
-      # $logger.debug("Running instruction", :payload => {
-      #   :op => MAPPING[@op],
-      #   :pc => @pc.to_hex
-      # })
-      decode_and_execute(@op)
-    else
-      @ticks += 4
-    end
-
-    @ppu.step(by: 4)
-  rescue => e
-    $logger.error("Error during instruction: #{@op.to_hex}", :exception => e)
-    #raise
-  end
-
-
-  private
-
-    def decode_and_execute(opcode)
-      instructions = MAPPING[opcode]
-
-      raise "Unimplemented opcode" unless instructions
-
-      send(*instructions)
-    end
 
 end

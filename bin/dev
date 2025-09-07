@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 require_relative '../config/boot'
 
-App.new.run
+rom = File.read(ARGV[0]).bytes
+Gameboy.new(rom, RaylibLCD.new).run

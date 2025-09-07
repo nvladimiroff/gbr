@@ -282,7 +282,7 @@ class CPUTest < Minitest::Test
       bit 4, a
     end
 
-    assert_equal(true, @gb.zero_flag)
+    assert_equal(true, @gb.cpu.zero_flag)
   end
 
 

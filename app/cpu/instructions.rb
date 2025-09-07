@@ -352,14 +352,14 @@ module CPU::Instructions
     def ldh(dest, src)
       src_value = case src
       when :a then a
-      when [:c] then mmu[0xFF00 + c]
-      when [:n8] then mmu[0xFF00 + n8]
+      when [:c] then @mmu[0xFF00 + c]
+      when [:n8] then @mmu[0xFF00 + n8]
       end
 
       case dest
       when :a then self.a = src_value
-      when [:c] then mmu[0xFF00 + c] = src_value
-      when [:n8] then mmu[0xFF00 + n8] = src_value
+      when [:c] then @mmu[0xFF00 + c] = src_value
+      when [:n8] then @mmu[0xFF00 + n8] = src_value
       end
     end
 

@@ -13,7 +13,9 @@ loader.inflector.inflect(
   'cpu' => "CPU",
   'mmu' => "MMU",
   'ppu' => 'PPU',
-  'raylib_ppu' => 'RaylibPPU'
+  'lcd' => 'LCD',
+  'raylib_lcd' => 'RaylibLCD',
+  'headless_lcd' => 'HeadlessLCD'
 )
 loader.setup
 SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)

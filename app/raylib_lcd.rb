@@ -1,12 +1,11 @@
-class Renderer
+class RaylibLCD
 
   attr_writer(:fps)
 
   SCALE = 4
 
 
-  def initialize(ppu)
-    @ppu = ppu
+  def initialize
     @fps = 60
     @last_frame_time = Time.at(0)
     @texture = nil
@@ -22,7 +21,7 @@ class Renderer
   end
 
 
-  def render_frame
+  def render_frame(pixels)
     return unless Time.now - @last_frame_time > 1.0/@fps
 
     if Raylib.WindowShouldClose
@@ -32,7 +31,7 @@ class Renderer
 
     Raylib.BeginDrawing
       Raylib.ClearBackground(Raylib::RAYWHITE)
-      Raylib.UpdateTexture(@texture, @ppu.pixels.pack('N*'))
+      Raylib.UpdateTexture(@texture, pixels.pack('N*'))
       Raylib.DrawTextureEx(@texture, Raylib::Vector2.create(0, 0), 0.0, SCALE, Raylib::RAYWHITE)
     Raylib.EndDrawing
 

@@ -24,10 +24,10 @@ class Minitest::Test
       @gb.step
 
       # Run until NOP twice
-      if @gb.instance_variable_get(:@op) == 0 && @prev_inst == 0
+      if @gb.cpu.op == 0 && @prev_inst == 0
         break
       end
-      @prev_inst = @gb.instance_variable_get(:@op)
+      @prev_inst = @gb.cpu.op
     end
   end
 
