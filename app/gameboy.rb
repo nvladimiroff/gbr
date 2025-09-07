@@ -11,7 +11,7 @@ class Gameboy
   def initialize(rom)
     @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
-    @ppu = PPU.new
+    @ppu = PPU.new(@interrupts)
     @mmu = MMU.new(@cartridge, @ppu, @interrupts)
     @pc = 0x0100
     @sp = 0xfffe

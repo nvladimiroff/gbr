@@ -13,7 +13,8 @@ class PPU
   }
 
 
-  def initialize
+  def initialize(interrupts)
+    @interrupts = interrupts
     @mode = :oam
     @clock = 0
     @disabled = false
@@ -50,7 +51,7 @@ class PPU
         @ly += 1
 
         if last_visible_line?
-          # trigger vblank interrupt too
+          @interrupts.fire(:vblank)
           transition(:vblank)
         else
           transition(:oam)
