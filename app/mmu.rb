@@ -47,6 +47,8 @@ class MMU
 
   def []=(addr, value)
     case addr
+    when 0x2000..0x3FFF
+      @cartridge.swap_bank(value)
     when 0x0..0x7FFF
       # Ignore it. You can't write to the ROM.
     when 0x8000..0x9FFF

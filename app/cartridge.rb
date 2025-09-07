@@ -17,4 +17,10 @@ class Cartridge
     end
   end
 
+
+  def swap_bank(bank)
+    @bank = bank
+    @bank = 1 if @bank == 0
+  end
+
 end
