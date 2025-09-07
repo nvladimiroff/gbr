@@ -7,6 +7,9 @@ class MMU
     @wram = Array.new(0x2000, 0)
     @interrupts = interrupts
     @zram = Array.new(0x80, 0)
+
+    # TEMP
+    @joypad = 0x00
   end
 
 
@@ -30,13 +33,26 @@ class MMU
     when 0xFEA0..0xFEFF
       # Unusable
       0xFF
-    when 0xFF0F # Interrupts
-      @interrupts[0xFF0F]
-    when 0xFF44
-      @ppu.ly
-    when 0xFF00..0xFF7F
+    when 0xFF00
+      @joypad
+    when 0xFF01..0xFF02
+      # TODO: Serial communication
       0xFF
-      # Other IO I haven't implemented yet.
+    when 0xFF05..0xFF07
+      # TODO: Timers
+      0xFF
+    when 0xFF0F
+      # Interrupts
+      @interrupts[0xFF0F]
+    when 0xFF10..0xFF3F
+      # TODO: Sound
+      0xFF
+    when 0xFF40..0xFF4B
+      @ppu[addr]
+    when 0xFF00..0xFF7F
+      # TODO: Other IO I haven't implemented yet.
+      $logger.warn('Unimplemented memory read', addr: addr.to_hex)
+      0xFF
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80]
     when 0xFFFF
@@ -65,10 +81,21 @@ class MMU
       @ppu[addr] = value
     when 0xFEA0..0xFEFF
       # Unusable
+    when 0xFF00
+      @joypad = value
+    when 0xFF01..0xFF02
+      # TODO: Serial communication
+    when 0xFF05..0xFF07
+      # TODO: Timers
     when 0xFF0F
       @interrupts[0xFF0F] = value
+    when 0xFF10..0xFF3F
+      # TODO: Sound
+    when 0xFF40..0xFF4B
+      @ppu[addr] = value
     when 0xFF00..0xFF7F
-      # Other IO I haven't implemented yet.
+      # TODO: Other IO I haven't implemented yet.
+      $logger.warn('Unimplemented memory write', addr: addr.to_hex, value: value.to_hex)
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80] = value
     when 0xFFFF

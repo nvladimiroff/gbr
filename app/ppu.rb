@@ -1,5 +1,6 @@
 class PPU
 
+  attr_accessor(:scy, :scx, :wx, :wy)
   attr_reader(:pixels, :ly)
 
   WIDTH = 160
@@ -21,6 +22,7 @@ class PPU
     @pixels = Array.new(WIDTH*HEIGHT, 0)
     @vram = Array.new(0x2000, 0)
     @oam = Array.new(0xA0, 0xFF)
+    @lcdc = 0
 
     @scx = 0
     @scy = 0
@@ -77,6 +79,35 @@ class PPU
     when 0xFE00..0xFE9F
       # Sprites
       @oam[addr - 0xFE00]
+    when 0xFF40
+      @lcdc
+    when 0xFF41
+      # TODO: LCD status
+    when 0xFF42
+      @scy
+    when 0xFF43
+      @scx
+    when 0xFF44
+      @ly
+    when 0xFF45
+      # TODO: LYC
+      0xFF
+    when 0xFF46
+      # TODO: DMA (does this belong here?)
+      0xFF
+    when 0xFF47
+      # TODO: BGP
+      0xFF
+    when 0xFF48
+      # TODO: OBGP0
+      0xFF
+    when 0xFF49
+      # TODO: OBGP1
+      0xFF
+    when 0xFF4A
+      @wy
+    when 0xFF4B
+      @wx
     end
   end
 
@@ -89,7 +120,33 @@ class PPU
       @vram[addr - 0x8000] = value
     when 0xFE00..0xFE9F
       # Sprites
+      puts "WRITING SPRITE DATA #{addr.to_hex}=#{value.to_hex}"
       @oam[addr - 0xFE00] = value
+    when 0xFF40
+      @lcdc
+    when 0xFF41
+      # TODO: LCD status
+    when 0xFF42
+      @scy = value
+    when 0xFF43
+      @scx = value
+    when 0xFF44
+      # TODO: is this even settable?
+      @ly = value
+    when 0xFF45
+      # TODO: LYC
+    when 0xFF46
+      # TODO: DMA (does this belong here?)
+    when 0xFF47
+      # TODO: BGP
+    when 0xFF48
+      # TODO: OBGP0
+    when 0xFF49
+      # TODO: OBGP1
+    when 0xFF4A
+      @wy = value
+    when 0xFF4B
+      @wx = value
     end
   end
 
@@ -153,7 +210,7 @@ class PPU
         sprite = read_sprite(sprite_index)
 
         # Is this sprite on the current scanline?
-        if @ly >= sprite[:y] && @ly < (sprite[:y] + 8)
+        if true #@ly >= sprite[:y] && @ly < (sprite[:y] + 8)
           line = @ly - sprite[:y]
 
           byte_1 = @vram[sprite[:tile] * 16 + line]
