@@ -24,8 +24,11 @@ class MMU
       # WRAM (Shadow)
       @wram[addr - 0xE000]
     when 0xFE00..0xFE9F
-      0xFF
       # Sprites
+      0xFF
+    when 0xFEA0..0xFEFF
+      # Unusable
+      0xFF
     when 0xFF0F # Interrupts
       @interrupts.pending_byte
     when 0xFF44
@@ -54,8 +57,10 @@ class MMU
       @wram[addr - 0xE000] = value
     when 0xFE00..0xFE9F
       # Sprites
-    when 0xFF0F # Interrupts
-
+    when 0xFEA0..0xFEFF
+      # Unusable
+    when 0xFF0F
+       # Interrupts
     when 0xFF00..0xFF7F
       # Other IO I haven't implemented yet.
     when 0xFF80..0xFFFF
