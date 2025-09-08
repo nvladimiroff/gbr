@@ -260,24 +260,56 @@ module CPU::Instructions
 
 
     def inc(dest)
+      if reg_is_16bit?(dest)
+        inc16(dest)
+      else
+        inc8(dest)
+      end
+    end
+
+
+    def inc8(dest)
       value = load(dest)
-      new_value = value + 1
+      new_value = (value + 1) & 0xFF
       assign(dest, new_value)
 
-      self.zero_flag = (new_value & 0xFF) == 0
+      self.zero_flag = new_value == 0
       self.subtract_flag = false
       self.half_carry_flag = (value & 0xF) + 1 > 0xF;
     end
 
 
-    def dec(dest)
+    def inc16(dest)
       value = load(dest)
-      new_value = value - 1
+      new_value = (value + 1) & 0xFFFF
+      assign(dest, new_value)
+    end
+
+
+    def dec(dest)
+      if reg_is_16bit?(dest)
+        dec16(dest)
+      else
+        dec8(dest)
+      end
+    end
+
+
+    def dec8(dest)
+      value = load(dest)
+      new_value = (value - 1) & 0xFF
       assign(dest, new_value)
 
       self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
       self.half_carry_flag = (value & 0xF) - 1 > 0xF;
+    end
+
+
+    def dec16(dest)
+      value = load(dest)
+      new_value = (value - 1) & 0xFFFF
+      assign(dest, new_value)
     end
 
 
