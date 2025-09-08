@@ -118,7 +118,7 @@ module CPU::Instructions
     def or_(dest, src)
       dest_value = load(dest)
       src_value = load(src)
-      result = dest_value | src_value
+      result = (dest_value | src_value) & 0xFF
 
       assign(dest, result)
 
@@ -337,7 +337,7 @@ module CPU::Instructions
       self.zero_flag = new_value == 0
       self.subtract_flag = false
       self.half_carry_flag = false
-      self.carry_flag = dest_value & 0x80 == 0x80
+      self.carry_flag = dest_value[0] == 1
     end
 
 
