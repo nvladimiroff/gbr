@@ -323,7 +323,6 @@ module CPU::Instructions
     def pop(dst)
       value = @mmu.read_word(@sp)
       assign(dst, value)
-      puts "#{af.to_hex}"
       @sp += 2
     end
 

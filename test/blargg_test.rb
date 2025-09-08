@@ -21,7 +21,6 @@ class BlarggTest < Minitest::Test
       inc c
       jp nz, 0x0100
     end
-    @gb.dump_state
 
     refute_equal(0xFF, @gb.cpu.h)
   end

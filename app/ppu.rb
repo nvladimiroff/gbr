@@ -133,8 +133,7 @@ class PPU
     when 0xFF43
       @scx = value
     when 0xFF44
-      # TODO: is this even settable?
-      @ly = value
+      # LY isn't writable.
     when 0xFF45
       # TODO: LYC
     when 0xFF46
@@ -187,7 +186,7 @@ class PPU
 
 
     def render_bg_scanline
-      y = @ly + @scy
+      y = (@ly + @scy) & 0xFF
       tile_row = (y / 8) * 32
 
       WIDTH.times do |pixel|
