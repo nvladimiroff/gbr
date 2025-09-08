@@ -465,4 +465,11 @@ module CPU::Instructions
       self.carry_flag = dest_value & 0x01 > 0
     end
 
+
+    def ccf
+      self.subtract_flag = false
+      self.half_carry_flag = false
+      self.carry_flag = !carry_flag
+    end
+
 end
