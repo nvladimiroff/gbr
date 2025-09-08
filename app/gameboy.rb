@@ -16,7 +16,8 @@ class Gameboy
 
 
   def run
-    @lcd.open_window
+    @lcd.open_window(@cartridge.title)
+    print_debug_info
 
     loop do
       step
@@ -60,5 +61,12 @@ class Gameboy
       end
     end
   end
+
+
+  private
+
+    def print_debug_info
+      puts "#{@cartridge.title} - TYPE: #{@cartridge.type.to_hex}"
+    end
 
 end

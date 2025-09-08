@@ -4,7 +4,6 @@ class MMU
     @cartridge = cartridge
     @ppu = ppu
     @timers = timers
-    @eram = Array.new(0x2000, 0)
     @wram = Array.new(0x2000, 0)
     @interrupts = interrupts
     @zram = Array.new(0x80, 0)
@@ -22,7 +21,7 @@ class MMU
       # VRAM
       @ppu[addr]
     when 0xA000..0xBFFF
-      @eram[addr - 0xA000]
+      @cartridge[addr]
     when 0xC000..0xDFFF
       @wram[addr - 0xC000]
     when 0xE000..0xFDFF
@@ -63,14 +62,12 @@ class MMU
 
   def []=(addr, value)
     case addr
-    when 0x2000..0x3FFF
-      @cartridge.swap_bank(value)
     when 0x0..0x7FFF
-      # Ignore it. You can't write to the ROM.
+      @cartridge[addr] = value
     when 0x8000..0x9FFF
       @ppu[addr] = value
     when 0xA000..0xBFFF
-      @eram[addr - 0xA000] = value
+      @cartridge[addr] = value
     when 0xC000..0xDFFF
       @wram[addr - 0xC000] = value
     when 0xE000..0xFDFF
@@ -84,7 +81,7 @@ class MMU
     when 0xFF00
       @joypad = value
     when 0xFF01
-      $logger.info("Serial communication: #{value.chr}")
+      STDOUT.write(value.chr)
     when 0xFF02
       # TODO: Serial communication
     when 0xFF04..0xFF07
