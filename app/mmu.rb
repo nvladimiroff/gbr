@@ -85,11 +85,18 @@ class MMU
     when 0xFF02
       # TODO: Serial communication
     when 0xFF04..0xFF07
-      @timers[addr]
+      @timers[addr] = value
     when 0xFF0F
       @interrupts[0xFF0F] = value
     when 0xFF10..0xFF3F
       # TODO: Sound
+    when 0xFF46
+      # DMA
+      # TODO (low): this actually progresses at one byte per 4 cycles.
+      location = value << 8
+      0xA0.times do |i|
+        @ppu[0xFE00 + i] = self[location + i]
+      end
     when 0xFF40..0xFF4B
       @ppu[addr] = value
     when 0xFF00..0xFF7F

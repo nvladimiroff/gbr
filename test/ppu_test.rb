@@ -3,6 +3,10 @@ require_relative './test_helper'
 class PPUTest < Minitest::Test
 
   def test_render_black_screen
+    load_program(at: 0x040) do
+      reti
+    end
+
     run_program do
       ld hl, 0x8000
       ld a, 0xFF
@@ -20,6 +24,10 @@ class PPUTest < Minitest::Test
 
 
   def test_render_white_screen
+    load_program(at: 0x040) do
+      reti
+    end
+
     run_program do
       ld hl, 0x8000
       ld a, 0x00

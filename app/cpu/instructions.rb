@@ -177,7 +177,7 @@ module CPU::Instructions
 
 
     def ei
-      @interrupts.ime = true
+      @enable_ime_next_step = true
     end
 
 
