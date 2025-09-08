@@ -12,9 +12,9 @@ class RaylibLCD
   end
 
 
-  def open_window
+  def open_window(title)
     Raylib.load_lib('libraylib')
-    Raylib.InitWindow(PPU::WIDTH*SCALE, PPU::HEIGHT*SCALE, 'GBR')
+    Raylib.InitWindow(PPU::WIDTH*SCALE, PPU::HEIGHT*SCALE, "GBR - #{title}")
     image = Raylib.GenImageColor(PPU::WIDTH, PPU::HEIGHT, Raylib::RAYWHITE)
     image.format = Raylib::PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
     @texture = Raylib.LoadTextureFromImage(image)
