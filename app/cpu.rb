@@ -36,20 +36,24 @@ class CPU
       @sp -= 2
       @mmu.write_word(@sp, @pc)
       @pc = addr
-      @halted = false
     end
 
-    unless @halted
-      @op = @mmu[@pc]
-      @pc = (@pc + 1) & 0xFFFF
-      $logger.debug("Running instruction", :payload => {
-        :op => MAPPING[@op],
-        :pc => @pc.to_hex
-      })
-      decode_and_execute(@op)
-    else
-      @total_ticks += 4
+    @total_ticks += 4 # TODO: real timing
+    return if @halted
+
+    if @enable_ime_next_step
+      @enable_ime_next_step = false
+      @interrupts.ime = true
     end
+
+    @prev_op = @op
+    @op = @mmu[@pc]
+    @pc = (@pc + 1) & 0xFFFF
+    $logger.debug("Running instruction", :payload => {
+      :op => MAPPING[@op],
+      :pc => @pc.to_hex
+    })
+    decode_and_execute(@op)
   rescue => e
     $logger.error("Error during instruction: #{@op&.to_hex}", :exception => e)
   end

@@ -48,6 +48,7 @@ class Interrupts
       @ime = false
       @pending[type] = false
       yield(type, ADDRESS_MAPPING[type])
+      break
     end
 
   end
