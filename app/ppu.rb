@@ -22,7 +22,8 @@ class PPU
     @pixels = Array.new(WIDTH*HEIGHT, 0)
     @vram = Array.new(0x2000, 0)
     @oam = Array.new(0xA0, 0xFF)
-    @lcdc = 0
+    @lcdc = 0x91
+    @stat = 0x05
 
     @scx = 0
     @scy = 0
@@ -83,6 +84,7 @@ class PPU
       @lcdc
     when 0xFF41
       # TODO: LCD status
+      0xFF
     when 0xFF42
       @scy
     when 0xFF43
@@ -210,7 +212,7 @@ class PPU
         sprite = read_sprite(sprite_index)
 
         # Is this sprite on the current scanline?
-        if true #@ly >= sprite[:y] && @ly < (sprite[:y] + 8)
+        if @ly >= sprite[:y] && @ly < (sprite[:y] + 8)
           line = @ly - sprite[:y]
 
           byte_1 = @vram[sprite[:tile] * 16 + line]
