@@ -202,21 +202,50 @@ module CPU::Instructions
 
 
     def add(dest, src)
+      if reg_is_16bit?(src)
+        add16(dest, src)
+      elsif dest == :sp && src == :n8
+        signed_add_to_sp # TODO: make this less bad
+      else
+        add8(dest, src)
+      end
+    end
+
+
+    def add8(dest, src)
       src_value = load(src)
       dst_value = load(dest)
       new_value = src_value + dst_value
       assign(dest, new_value)
 
-      if reg_is_16bit?(src)
-        self.subtract_flag = false
-        self.carry_flag = new_value > 0xFFFF
-        self.half_carry_flag = (dst_value & 0xFFF) + (src_value & 0xFFF) > 0xFFF
-      else
-        self.zero_flag = new_value == 0
-        self.subtract_flag = false
-        self.carry_flag = new_value > 0xFF
-        self.half_carry_flag = (dst_value & 0xF) + (src_value & 0xF) > 0xF
-      end
+      self.zero_flag = (new_value & 0xFF) == 0
+      self.subtract_flag = false
+      self.carry_flag = new_value > 0xFF
+      self.half_carry_flag = (dst_value & 0xF) + (src_value & 0xF) > 0xF
+    end
+
+
+    def add16(dest, src)
+      src_value = load(src)
+      dst_value = load(dest)
+      new_value = src_value + dst_value
+      assign(dest, new_value)
+
+      self.subtract_flag = false
+      self.carry_flag = new_value > 0xFFFF
+      self.half_carry_flag = (dst_value & 0xFFF) + (src_value & 0xFFF) > 0xFFF
+    end
+
+
+    def signed_add_to_sp
+      inc = to_signed_byte(n8)
+      new_value = sp + inc
+      self.sp = new_value
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.carry_flag = new_value > 0xFF
+      self.half_carry_flag = (sp & 0xF) + (inc & 0xF) > 0xF
     end
 
 
@@ -492,6 +521,31 @@ module CPU::Instructions
       self.subtract_flag = false
       self.half_carry_flag = false
       self.carry_flag = dest_value[7] == 1
+    end
+
+
+    def daa
+      # Truly no idea what this is doing.
+      # See https://rgbds.gbdev.io/docs/v0.9.4/gbz80.7#DAA
+      if subtract_flag
+        adjustment = 0
+        adjustment += 0x06 if half_carry_flag
+        adjustment += 0x60 if carry_flag
+        self.a -= adjustment
+      else
+        adjustment = 0
+        if half_carry_flag || a & 0x0F > 0x09
+          adjustment += 0x06
+        end
+        if carry_flag || a > 0x99
+          adjustment += 0x60
+          self.carry_flag = true # TODO: is this right?
+        end
+        self.a += adjustment
+      end
+
+      self.zero_flag = a == 0
+      self.half_carry_flag = false
     end
 
 end
