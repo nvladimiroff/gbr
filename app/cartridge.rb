@@ -51,7 +51,6 @@ class Cartridge
     when 0x0000..0x1FFF
       @ram_enabled = value & 0x0F == 0x0A
     when 0x2000..0x3FFF
-      puts "Switching ROM bank"
       @rom_bank = value
       @rom_bank = 1 if @rom_bank == 0
     when 0x4000..0x5FFF

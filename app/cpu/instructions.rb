@@ -314,16 +314,17 @@ module CPU::Instructions
 
 
     def push(src)
-      value = load(src)
       @sp -= 2
+      value = load(src)
       @mmu.write_word(@sp, value)
     end
 
 
     def pop(dst)
       value = @mmu.read_word(@sp)
-      @sp += 2
       assign(dst, value)
+      puts "#{af.to_hex}"
+      @sp += 2
     end
 
 

@@ -47,7 +47,6 @@ class Interrupts
 
       @ime = false
       @pending[type] = false
-      $logger.warn("Handling interrupt")
       yield(type, ADDRESS_MAPPING[type])
     end
 

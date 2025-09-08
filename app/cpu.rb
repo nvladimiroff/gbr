@@ -4,7 +4,7 @@ class CPU
 
   attr_accessor(:sp)
   attr_reader(:pc, :op, :last_ticks)
-  reg_8_bit(:a, :b, :c, :d, :e, :f, :h, :l)
+  reg_8_bit(:a, :b, :c, :d, :e, :h, :l)
   reg_16_bit(:af, :bc, :de, :hl)
 
 

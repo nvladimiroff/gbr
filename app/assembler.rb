@@ -1,6 +1,6 @@
 class Assembler
 
-  VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :de, :hl, :nz, :z]
+  VALUES = [:a, :b, :c, :d, :e, :f, :l, :bc, :de, :hl, :nz, :z, :af, :h, :hl]
 
 
   def self.compile(&block)

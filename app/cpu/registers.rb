@@ -3,43 +3,54 @@ module CPU::Registers
   extend ActiveSupport::Concern
 
 
+  # Special handling for f because the lower 4 bits are always zero.
+  def f
+    @f & 0xF0
+  end
+
+
+  def f=(value)
+    @f = value & 0xF0
+  end
+
+
   def zero_flag
-    f[7] == 1
+    @f[7] == 1
   end
 
 
   def zero_flag=(value)
-    self.f = set_bit(f, 7, value)
+    @f = set_bit(@f, 7, value)
   end
 
 
   def subtract_flag
-    f[6] == 1
+    @f[6] == 1
   end
 
 
   def subtract_flag=(value)
-    self.f = set_bit(f, 6, value)
+    @f = set_bit(@f, 6, value)
   end
 
 
   def half_carry_flag
-    f[5] == 1
+    @f[5] == 1
   end
 
 
   def half_carry_flag=(value)
-    self.f = set_bit(f, 5, value)
+    @f = set_bit(@f, 5, value)
   end
 
 
   def carry_flag
-    f[4] == 1
+    @f[4] == 1
   end
 
 
   def carry_flag=(value)
-    self.f = set_bit(f, 4, value)
+    @f = set_bit(@f, 4, value)
   end
 
 

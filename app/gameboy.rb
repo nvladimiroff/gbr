@@ -46,12 +46,12 @@ class Gameboy
       end
 
       out.section("INSTRUCTIONS") do
-        out.line("Last instruction executed: #{MAPPING[@cpu.op]}")
-        out.line("Next instruction: #{MAPPING[@mmu[@cpu.pc+1]]}")
+        out.line("Last instruction executed: #{CPU::Opcodes::MAPPING[@cpu.op]}")
+        out.line("Next instruction: #{CPU::Opcodes::MAPPING[@mmu[@cpu.pc+1]]}")
       end
 
       out.section("INTERRUPTS") do
-        out.line("Pending interrupts: #{@interrupts.pending_byte}")
+        out.line("Pending interrupts: #{@interrupts.pending_byte.to_hex}")
       end
 
       out.section("MEMORY") do
