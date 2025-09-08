@@ -54,7 +54,6 @@ class Cartridge
       @rom_bank = value
       @rom_bank = 1 if @rom_bank == 0
     when 0x4000..0x5FFF
-      puts "Switching RAM bank"
       @ram_bank = value
     when 0x6000..0x7FFF
       # TODO: Mysterious clock stuff.
