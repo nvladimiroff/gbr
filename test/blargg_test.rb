@@ -16,10 +16,10 @@ class BlarggTest < Minitest::Test
       ld a, c
       and_ a, 0xF0
       cp a, e
-      call 0x0200
+      call nz, 0x0200
       inc b
       inc c
-      jp nz, 0x0100
+      jp nz, 0x0103
     end
 
     refute_equal(0xFF, @gb.cpu.h)

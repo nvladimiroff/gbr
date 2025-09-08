@@ -51,7 +51,7 @@ class Gameboy
       end
 
       out.section("INTERRUPTS") do
-        out.line("Pending interrupts: #{@interrupts.pending_byte.to_hex}")
+        out.line("Pending interrupts: #{@interrupts[0xFF0F].to_hex}")
       end
 
       out.section("MEMORY") do

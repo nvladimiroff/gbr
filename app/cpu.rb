@@ -4,8 +4,8 @@ class CPU
 
   attr_accessor(:sp)
   attr_reader(:pc, :op, :last_ticks)
-  reg_8_bit(:a, :b, :c, :d, :e, :h, :l)
-  reg_16_bit(:af, :bc, :de, :hl)
+  reg_8_bit(:a, :b, :c, :d, :e, :h, :l) # F gets special handling
+  reg_16_bit(:bc, :de, :hl) # AF gets special handling
 
 
   def initialize(mmu, interrupts)

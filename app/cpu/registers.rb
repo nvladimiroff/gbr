@@ -3,13 +3,24 @@ module CPU::Registers
   extend ActiveSupport::Concern
 
 
-  # Special handling for f because the lower 4 bits are always zero.
+  # Special handling for f and af because the lower 4 bits are always zero.
   def f
     @f & 0xF0
   end
 
 
   def f=(value)
+    @f = value & 0xF0
+  end
+
+
+  def af
+    (@a << 8) | @f
+  end
+
+
+  def af=(value)
+    @a = (value >> 8) & 0xFF
     @f = value & 0xF0
   end
 
