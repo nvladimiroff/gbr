@@ -103,24 +103,4 @@ class Interrupts
     end
   end
 
-
-
-
-  def pending_byte
-    byte = 0x00
-
-    byte |= 0x01 if @pending.include?(:vblank)
-    byte |= 0x02 if @pending.include?(:lcd_stat)
-    byte |= 0x04 if @pending.include?(:timer_overflow)
-    byte |= 0x08 if @pending.include?(:serial)
-    byte |= 0x10 if @pending.include?(:joypad)
-
-    byte
-  end
-
-
-  def byte=(value)
-    # TODO
-  end
-
 end
