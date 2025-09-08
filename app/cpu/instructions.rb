@@ -255,7 +255,7 @@ module CPU::Instructions
       new_value = src_value + dst_value + (self.carry_flag ? 1 : 0)
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
+      self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = false
       self.carry_flag = new_value > 0xFF
       self.half_carry_flag = (src_value & 0xF) + (dst_value & 0xF) + (self.carry_flag ? 1 : 0) > 0xF;
@@ -268,7 +268,7 @@ module CPU::Instructions
       new_value = dst_value - src_value
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
+      self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
       self.carry_flag = new_value < 0xFF
       self.half_carry_flag = (dst_value & 0xF) - (src_value & 0xF) > 0xF;
@@ -281,7 +281,7 @@ module CPU::Instructions
       new_value = src_value - dst_value - (self.carry_flag ? 1 : 0)
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
+      self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
       self.carry_flag = new_value < 0xFF
       self.half_carry_flag = (src_value & 0xF) - (dst_value & 0xF) - (self.carry_flag ? 1 : 0) > 0xF;
