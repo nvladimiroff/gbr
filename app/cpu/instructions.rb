@@ -103,7 +103,7 @@ module CPU::Instructions
 
     def and_(dest, src)
       dest_value = load(dest)
-      src_value = load(dest)
+      src_value = load(src)
       result = dest_value & src_value
 
       assign(dest, result)
