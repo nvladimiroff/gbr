@@ -472,6 +472,7 @@ module CPU::Instructions
       self.carry_flag = !carry_flag
     end
 
+
     def ld_hl_sp_n8
       self.hl = sp + n8
 
@@ -479,6 +480,18 @@ module CPU::Instructions
       self.subtract_flag = false
       self.half_carry_flag = false # TODO: WRONG
       self.carry_flag = false # TODO: WRONG
+    end
+
+
+    def sla(dest)
+      dest_value = load(dest)
+      new_value = (dest_value << 1) & 0xFF
+      assign(dest, new_value)
+
+      self.zero_flag = new_value == 0
+      self.subtract_flag = false
+      self.half_carry_flag = false
+      self.carry_flag = dest_value[7] == 1
     end
 
 end
