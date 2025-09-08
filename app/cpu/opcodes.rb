@@ -260,6 +260,7 @@ module CPU::Opcodes
     0xF5 => (push af),
     0xF6 => (or_ a, n8),
     0xF7 => (rst 0x30),
+    0xF8 => (ld_hl_sp_n8),
     0xF9 => (ld sp, hl),
     0xFA => (ld a, [n16]),
     0xFB => (ei),

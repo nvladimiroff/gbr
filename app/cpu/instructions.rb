@@ -472,4 +472,13 @@ module CPU::Instructions
       self.carry_flag = !carry_flag
     end
 
+    def ld_hl_sp_n8
+      self.hl = sp + n8
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.half_carry_flag = false # TODO: WRONG
+      self.carry_flag = false # TODO: WRONG
+    end
+
 end
