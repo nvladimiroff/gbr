@@ -84,7 +84,7 @@ class MMU
     when 0xFF00
       @joypad = value
     when 0xFF01
-      $logger.info("Serial communication: #{value}")
+      $logger.info("Serial communication: #{value.chr}")
     when 0xFF02
       # TODO: Serial communication
     when 0xFF04..0xFF07
