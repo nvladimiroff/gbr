@@ -18,7 +18,6 @@ class PPU
     @interrupts = interrupts
     @mode = :oam
     @clock = 0
-    @disabled = false
     @pixels = Array.new(WIDTH*HEIGHT, 0)
     @vram = Array.new(0x2000, 0)
     @oam = Array.new(0xA0, 0xFF)
@@ -36,7 +35,7 @@ class PPU
 
 
   def step(**opts)
-    return  if @disabled
+    return  unless lcd_enabled?
 
     @clock += opts[:by]
 
@@ -122,7 +121,6 @@ class PPU
       @vram[addr - 0x8000] = value
     when 0xFE00..0xFE9F
       # Sprites
-      puts "WRITING SPRITE DATA #{addr.to_hex}=#{value.to_hex}"
       @oam[addr - 0xFE00] = value
     when 0xFF40
       @lcdc
@@ -180,8 +178,9 @@ class PPU
 
 
     def render_scanline
-      render_bg_scanline
-      render_sprite_scanline
+      puts "LCDC: #{@lcdc.to_s(2)}"
+      render_bg_scanline if background_enabled?
+      render_sprite_scanline if sprites_enabled?
     end
 
 
@@ -193,7 +192,11 @@ class PPU
         x = pixel + @scx
 
         tile_col = x / 8
-        tile_index = @vram[0x1800 + tile_row + tile_col]
+        tile_map_address = tile_map_start + tile_row + tile_col
+        if tile_data_signed?
+          tile_map_address = to_signed_byte(tile_map_address)
+        end
+        tile_index = @vram[tile_map_address]
 
         line = (y % 8) * 2
 
@@ -238,5 +241,48 @@ class PPU
         tile:
       }
     end
+
+
+    def background_enabled?
+      @lcdc[0] == 1
+    end
+
+
+    def sprites_enabled?
+      @lcdc[1] == 1
+    end
+
+
+    # TODO: what does this do?
+    def sprite_size
+      @lcdc[2]
+    end
+
+
+    def tile_map_start
+      # TODO: support window here too
+      @lcdc[3] == 1 ? 0x1C00 : 0x1800
+    end
+
+
+    def tile_data_start
+      @lcdc[4] == 1 ? 0x0000 : 0x0800
+    end
+
+
+    def tile_data_signed?
+      @lcdc[4] != 1
+    end
+
+
+    def window_enabled?
+      @lcdc[6] == 1
+    end
+
+
+    def lcd_enabled?
+      @lcdc[7] == 1
+    end
+
 
 end
