@@ -19,7 +19,7 @@ loader.inflector.inflect(
 )
 loader.setup
 SemanticLogger.add_appender(io: $stdout, level: :trace, formatter: :color)
-SemanticLogger.default_level = :warn
+SemanticLogger.default_level = :info
 $logger = SemanticLogger['Gameboy']
 
 module ToHex
