@@ -264,7 +264,7 @@ module CPU::Instructions
       new_value = value + 1
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
+      self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = false
       self.half_carry_flag = (value & 0xF) + 1 > 0xF;
     end
@@ -275,7 +275,7 @@ module CPU::Instructions
       new_value = value - 1
       assign(dest, new_value)
 
-      self.zero_flag = new_value == 0
+      self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
       self.half_carry_flag = (value & 0xF) - 1 > 0xF;
     end
