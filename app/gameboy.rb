@@ -6,10 +6,11 @@ class Gameboy
 
   def initialize(rom, lcd = nil)
     @lcd = lcd || HeadlessLCD.new
-    @cartridge = Cartridge.new(rom)
     @interrupts = Interrupts.new
+    @timers = Timers.new
+    @cartridge = Cartridge.new(rom)
     @ppu = PPU.new(@interrupts)
-    @mmu = MMU.new(@cartridge, @ppu, @interrupts)
+    @mmu = MMU.new(@cartridge, @ppu, @interrupts, @timers)
     @cpu = CPU.new(@mmu, @interrupts)
   end
 
@@ -26,6 +27,7 @@ class Gameboy
   def step
     @cpu.step
     @ppu.step(by: @cpu.last_ticks)
+    @timers.step(by: @cpu.last_ticks)
     @lcd.render_frame(@ppu.pixels)
   end
 

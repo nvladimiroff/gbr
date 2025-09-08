@@ -1,15 +1,16 @@
 class MMU
 
-  def initialize(cartridge, ppu, interrupts)
+  def initialize(cartridge, ppu, interrupts, timers)
     @cartridge = cartridge
     @ppu = ppu
+    @timers = timers
     @eram = Array.new(0x2000, 0)
     @wram = Array.new(0x2000, 0)
     @interrupts = interrupts
     @zram = Array.new(0x80, 0)
 
     # TEMP
-    @joypad = 0x00
+    @joypad = 0xFF
   end
 
 
@@ -38,9 +39,8 @@ class MMU
     when 0xFF01..0xFF02
       # TODO: Serial communication
       0xFF
-    when 0xFF05..0xFF07
-      # TODO: Timers
-      0xFF
+    when 0xFF04..0xFF07
+      @timers[addr]
     when 0xFF0F
       # Interrupts
       @interrupts[0xFF0F]
@@ -83,10 +83,12 @@ class MMU
       # Unusable
     when 0xFF00
       @joypad = value
-    when 0xFF01..0xFF02
+    when 0xFF01
+      $logger.info("Serial communication: #{value}")
+    when 0xFF02
       # TODO: Serial communication
-    when 0xFF05..0xFF07
-      # TODO: Timers
+    when 0xFF04..0xFF07
+      @timers[addr]
     when 0xFF0F
       @interrupts[0xFF0F] = value
     when 0xFF10..0xFF3F
