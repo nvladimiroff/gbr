@@ -18,7 +18,7 @@ class PPU
     @interrupts = interrupts
     @mode = :oam
     @clock = 0
-    @pixels = Array.new(WIDTH*HEIGHT, 0)
+    @pixels = Array.new(WIDTH*HEIGHT, COLOR_MAP[0])
     @vram = Array.new(0x2000, 0)
     @oam = Array.new(0xA0, 0xFF)
     @lcdc = 0x91
@@ -93,9 +93,6 @@ class PPU
     when 0xFF45
       # TODO: LYC
       0xFF
-    when 0xFF46
-      # TODO: DMA (does this belong here?)
-      0xFF
     when 0xFF47
       # TODO: BGP
       0xFF
@@ -123,7 +120,7 @@ class PPU
       # Sprites
       @oam[addr - 0xFE00] = value
     when 0xFF40
-      @lcdc
+      @lcdc = value
     when 0xFF41
       # TODO: LCD status
     when 0xFF42
@@ -134,8 +131,6 @@ class PPU
       # LY isn't writable.
     when 0xFF45
       # TODO: LYC
-    when 0xFF46
-      # TODO: DMA (does this belong here?)
     when 0xFF47
       # TODO: BGP
     when 0xFF48
@@ -178,34 +173,65 @@ class PPU
 
 
     def render_scanline
-      puts "LCDC: #{@lcdc.to_s(2)}"
-      render_bg_scanline if background_enabled?
+      return unless lcd_enabled?
+
+      render_tiles
       render_sprite_scanline if sprites_enabled?
     end
 
 
-    def render_bg_scanline
-      y = (@ly + @scy) & 0xFF
-      tile_row = (y / 8) * 32
+    def render_tiles
+      using_window = window_enabled? && @wy <= @ly
 
-      WIDTH.times do |pixel|
-        x = pixel + @scx
+      tile_map_start = if using_window
+        window_tile_map_start
+      else
+        bg_tile_map_start
+      end
+
+      y = if using_window
+        @ly - @wy
+      else
+        @ly + @scy
+      end
+      y &= 0xFF
+
+      tile_row = y / 8
+      puts "LY: #{@ly}, SCY: #{@scy}, Y: #{y}, TILE_ROW: #{tile_row} WINDOW: #{using_window}" if using_window
+
+      (0..WIDTH).each do |pixel|
+        x = if using_window
+          pixel - (@wx - 7)
+        else
+          (@scx + pixel) & 0xFF
+        end
 
         tile_col = x / 8
-        tile_map_address = tile_map_start + tile_row + tile_col
-        if tile_data_signed?
-          tile_map_address = to_signed_byte(tile_map_address)
+        tile_address = tile_map_start + tile_row * 32 + tile_col
+        tile_index = if tile_data_signed?
+          to_signed_byte(@vram[tile_address])
+        else
+          @vram[tile_address]
         end
-        tile_index = @vram[tile_map_address]
+        tile_index = 0x65
+
+        tile_location = if tile_data_signed?
+          tile_data_start + (tile_index + 128) * 16
+        else
+          tile_data_start + tile_index * 16
+        end
 
         line = (y % 8) * 2
 
-        byte_1 = @vram[tile_index * 16 + line]
-        byte_2 = @vram[tile_index * 16 + line + 1]
+        byte_1 = @vram[tile_location + line]
+        byte_2 = @vram[tile_location + line + 1]
+        puts byte_1
+        puts byte_2
 
         color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
       end
+
     end
 
 
@@ -243,6 +269,12 @@ class PPU
     end
 
 
+    def to_signed_byte(byte)
+      byte &= 0xff
+      byte > 127 ? byte - 256 : byte
+    end
+
+
     def background_enabled?
       @lcdc[0] == 1
     end
@@ -259,8 +291,7 @@ class PPU
     end
 
 
-    def tile_map_start
-      # TODO: support window here too
+    def bg_tile_map_start
       @lcdc[3] == 1 ? 0x1C00 : 0x1800
     end
 
@@ -276,13 +307,17 @@ class PPU
 
 
     def window_enabled?
-      @lcdc[6] == 1
+      @lcdc[5] == 1
+    end
+
+
+    def window_tile_map_start
+      @lcdc[6] == 1 ? 0x1C00 : 0x1800
     end
 
 
     def lcd_enabled?
       @lcdc[7] == 1
     end
-
 
 end
