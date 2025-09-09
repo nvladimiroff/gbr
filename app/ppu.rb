@@ -31,6 +31,7 @@ class PPU
     @wy = 0
 
     @ly = 0
+    @lyc = 0
   end
 
 
@@ -50,6 +51,7 @@ class PPU
     when :hblank
       if elapsed(cycles: 204)
         @ly += 1
+        @interrupts.fire(:lcd_stat) if @ly == @lyc
 
         if last_visible_line?
           @interrupts.fire(:vblank)
@@ -61,6 +63,7 @@ class PPU
     when :vblank
       if elapsed(cycles: 456)
         @ly += 1
+        @interrupts.fire(:lcd_stat) if @ly == @lyc
 
         if last_line?
           @ly = 0
@@ -91,8 +94,7 @@ class PPU
     when 0xFF44
       @ly
     when 0xFF45
-      # TODO: LYC
-      0xFF
+      @lyc
     when 0xFF47
       # TODO: BGP
       0xFF
@@ -130,7 +132,7 @@ class PPU
     when 0xFF44
       # LY isn't writable.
     when 0xFF45
-      # TODO: LYC
+      @lyc = value
     when 0xFF47
       # TODO: BGP
     when 0xFF48
@@ -213,7 +215,6 @@ class PPU
         else
           @vram[tile_address]
         end
-        tile_index = 0x65
 
         tile_location = if tile_data_signed?
           tile_data_start + (tile_index + 128) * 16
@@ -225,8 +226,6 @@ class PPU
 
         byte_1 = @vram[tile_location + line]
         byte_2 = @vram[tile_location + line + 1]
-        puts byte_1
-        puts byte_2
 
         color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
