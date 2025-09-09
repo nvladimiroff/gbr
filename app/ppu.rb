@@ -22,7 +22,7 @@ class PPU
     @vram = Array.new(0x2000, 0)
     @oam = Array.new(0xA0, 0xFF)
     @lcdc = 0x91
-    @stat = 0x05
+    @lcd_stat = 0x05
 
     @scx = 0
     @scy = 0
@@ -85,8 +85,7 @@ class PPU
     when 0xFF40
       @lcdc
     when 0xFF41
-      # TODO: LCD status
-      0xFF
+      @lcd_stat
     when 0xFF42
       @scy
     when 0xFF43
@@ -124,7 +123,7 @@ class PPU
     when 0xFF40
       @lcdc = value
     when 0xFF41
-      # TODO: LCD status
+      @lcd_stat = value
     when 0xFF42
       @scy = value
     when 0xFF43
