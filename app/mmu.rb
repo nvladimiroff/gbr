@@ -1,15 +1,21 @@
 class MMU
 
-  def initialize(cartridge, ppu, interrupts, timers)
+  def initialize
+    @wram = Array.new(0x2000, 0)
+    @zram = Array.new(0x80, 0)
+
+    @interrupt_requested = 0x00
+    @interrupt_enabled = 0xFF
+
+    # TEMP
+    @joypad = 0xCF
+  end
+
+
+  def wire(cartridge, ppu, timers)
     @cartridge = cartridge
     @ppu = ppu
     @timers = timers
-    @wram = Array.new(0x2000, 0)
-    @interrupts = interrupts
-    @zram = Array.new(0x80, 0)
-
-    # TEMP
-    @joypad = 0xFF
   end
 
 
@@ -41,8 +47,7 @@ class MMU
     when 0xFF04..0xFF07
       @timers[addr]
     when 0xFF0F
-      # Interrupts
-      @interrupts[0xFF0F]
+      @interrupt_requested
     when 0xFF10..0xFF3F
       # TODO: Sound
       0xFF
@@ -55,7 +60,7 @@ class MMU
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80]
     when 0xFFFF
-      @interrupts[0xFFFF]
+      @interrupt_enabled
     end
   end
 
@@ -87,7 +92,7 @@ class MMU
     when 0xFF04..0xFF07
       @timers[addr] = value
     when 0xFF0F
-      @interrupts[0xFF0F] = value
+      @interrupt_requested = value
     when 0xFF10..0xFF3F
       # TODO: Sound
     when 0xFF46
@@ -105,7 +110,7 @@ class MMU
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80] = value
     when 0xFFFF
-      @interrupts[0xFF0F] = value
+      @interrupt_enabled = value
     end
   end
 

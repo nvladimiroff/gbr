@@ -1,6 +1,6 @@
 class CPU
 
-  include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions
+  include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions, CPU::Interrupts
 
   attr_accessor(:sp)
   attr_reader(:pc, :op, :last_ticks)
@@ -8,9 +8,8 @@ class CPU
   reg_16_bit(:bc, :de, :hl) # AF gets special handling
 
 
-  def initialize(mmu, interrupts)
+  def initialize(mmu)
     @mmu = mmu
-    @interrupts = interrupts
 
     @pc = 0x0100
     @sp = 0xfffe
@@ -28,23 +27,20 @@ class CPU
     @l = 0x4D
 
     @halted = false
+    @ime = true
   end
 
 
   def step
-    @interrupts.handle do |type, addr|
-      @sp -= 2
-      @mmu.write_word(@sp, @pc)
-      @pc = addr
+    handle_interrupts
+
+    if @enable_ime_next_step
+      @enable_ime_next_step = false
+      @ime = true
     end
 
     @total_ticks += 4 # TODO: real timing
     return if @halted
-
-    if @enable_ime_next_step
-      @enable_ime_next_step = false
-      @interrupts.ime = true
-    end
 
     @prev_op = @op
     @op = @mmu[@pc]

@@ -6,12 +6,15 @@ class Gameboy
 
   def initialize(rom, lcd = nil)
     @lcd = lcd || HeadlessLCD.new
-    @interrupts = Interrupts.new
     @timers = Timers.new
     @cartridge = Cartridge.new(rom)
-    @ppu = PPU.new(@interrupts)
-    @mmu = MMU.new(@cartridge, @ppu, @interrupts, @timers)
-    @cpu = CPU.new(@mmu, @interrupts)
+    @mmu = MMU.new
+    @cpu = CPU.new(@mmu)
+    @ppu = PPU.new(@cpu)
+
+    # TODO: this makes a cycle (mmu => cpu => ppu => mmu)
+    # Am I ok with that?
+    @mmu.wire(@cartridge, @timers, @ppu)
   end
 
 
@@ -34,7 +37,7 @@ class Gameboy
 
 
   def fire_interrupt(type)
-    @interrupts.fire(type)
+    @cpu.interrupt(type)
   end
 
 

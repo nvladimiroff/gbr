@@ -14,8 +14,8 @@ class PPU
   }
 
 
-  def initialize(interrupts)
-    @interrupts = interrupts
+  def initialize(cpu)
+    @cpu = cpu
     @mode = :oam
     @clock = 0
     @pixels = Array.new(WIDTH*HEIGHT, COLOR_MAP[0])
@@ -51,10 +51,10 @@ class PPU
     when :hblank
       if elapsed(cycles: 204)
         @ly += 1
-        @interrupts.fire(:lcd_stat) if @ly == @lyc
+        @cpu.interrupt(:lcd_stat) if @ly == @lyc
 
         if last_visible_line?
-          @interrupts.fire(:vblank)
+          @cpu.interrupt(:vblank)
           transition(:vblank)
         else
           transition(:oam)
@@ -63,7 +63,7 @@ class PPU
     when :vblank
       if elapsed(cycles: 456)
         @ly += 1
-        @interrupts.fire(:lcd_stat) if @ly == @lyc
+        @cpu.interrupt(:lcd_stat) if @ly == @lyc
 
         if last_line?
           @ly = 0
@@ -198,7 +198,6 @@ class PPU
       y &= 0xFF
 
       tile_row = y / 8
-      puts "LY: #{@ly}, SCY: #{@scy}, Y: #{y}, TILE_ROW: #{tile_row} WINDOW: #{using_window}" if using_window
 
       (0..WIDTH).each do |pixel|
         x = if using_window

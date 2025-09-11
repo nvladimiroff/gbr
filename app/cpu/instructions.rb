@@ -165,14 +165,14 @@ module CPU::Instructions
 
 
     def reti
-      @interrupts.ime = true
+      @ime = true
       @pc = @mmu.read_word(@sp)
       @sp += 2
     end
 
 
     def di
-      @interrupts.ime = false
+      @ime = false
     end
 
 
