@@ -1,7 +1,7 @@
 class PPU
 
   attr_accessor(:scy, :scx, :wx, :wy)
-  attr_reader(:pixels, :ly)
+  attr_reader(:pixels, :ly, :lyc)
 
   WIDTH = 160
   HEIGHT = 144
@@ -32,6 +32,8 @@ class PPU
 
     @ly = 0
     @lyc = 0
+
+    @internal_pixel = 0
   end
 
 
@@ -47,6 +49,7 @@ class PPU
       if elapsed(cycles: 172)
         render_scanline
         transition(:hblank)
+        @cpu.interrupt(:lcd_stat) if @ly == @lyc
       end
     when :hblank
       if elapsed(cycles: 204)
@@ -109,7 +112,6 @@ class PPU
       @wx
     end
   end
-
 
 
   def []=(addr, value)
@@ -177,50 +179,39 @@ class PPU
       return unless lcd_enabled?
 
       render_tiles
-      render_sprite_scanline if sprites_enabled?
+      #render_sprite_scanline if sprites_enabled?
     end
 
 
     def render_tiles
-      using_window = window_enabled? && @wy <= @ly
-
-      tile_map_start = if using_window
-        window_tile_map_start
-      else
-        bg_tile_map_start
-      end
-
-      y = if using_window
-        @ly - @wy
-      else
-        @ly + @scy
-      end
-      y &= 0xFF
-
-      tile_row = y / 8
+      return unless window_enabled? || background_enabled?
 
       (0..WIDTH).each do |pixel|
-        x = if using_window
-          pixel - (@wx - 7)
-        else
-          (@scx + pixel) & 0xFF
+        @internal_pixel = pixel
+        tile_x = case current_layer
+        when :background
+          (@scx + pixel)
+        when :window
+          (pixel - (@wx - 7))
         end
 
-        tile_col = x / 8
-        tile_address = tile_map_start + tile_row * 32 + tile_col
-        tile_index = if tile_data_signed?
-          to_signed_byte(@vram[tile_address])
-        else
-          @vram[tile_address]
+        tile_y = case current_layer
+        when :background
+          (@ly + @scy)
+        when :window
+          (@ly - @wy)
         end
+
+        tile_address = tile_map_start + (tile_y / 8) * 32 + tile_x / 8
+        tile_index = @vram[tile_address]
 
         tile_location = if tile_data_signed?
-          tile_data_start + (tile_index + 128) * 16
+          tile_data_start + (to_signed_byte(tile_index) + 128) * 16
         else
           tile_data_start + tile_index * 16
         end
 
-        line = (y % 8) * 2
+        line = (tile_y % 8) * 2
 
         byte_1 = @vram[tile_location + line]
         byte_2 = @vram[tile_location + line + 1]
@@ -243,7 +234,8 @@ class PPU
           byte_1 = @vram[sprite[:tile] * 16 + line]
           byte_2 = @vram[sprite[:tile] * 16 + line + 1]
 
-          8.times do |pixel|
+          (0..WIDTH).each do |pixel|
+            next unless pixel >= sprite[:x] && pixel < (sprite[:y] + 8)
             color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
             @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
           end
@@ -316,5 +308,25 @@ class PPU
     def lcd_enabled?
       @lcdc[7] == 1
     end
+
+
+    def current_layer
+      if window_enabled? && @wy <= @ly && @wx <= @internal_pixel
+        :window
+      else
+        :background
+      end
+    end
+
+
+    def tile_map_start
+      case current_layer
+      when :background
+        @lcdc[3] == 1 ? 0x1C00 : 0x1800
+      when :window
+        @lcdc[6] == 1 ? 0x1C00 : 0x1800
+      end
+    end
+
 
 end

@@ -1,6 +1,10 @@
 class Gameboy
 
-  attr_reader(:cpu, :mmu, :ppu)
+  class << self
+    attr_accessor(:instance)
+  end
+
+  attr_reader(:cpu, :mmu, :ppu, :lcd)
   delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
 
 
@@ -14,7 +18,8 @@ class Gameboy
 
     # TODO: this makes a cycle (mmu => cpu => ppu => mmu)
     # Am I ok with that?
-    @mmu.wire(@cartridge, @timers, @ppu)
+    @mmu.wire(@cartridge, @ppu, @timers)
+    self.class.instance = self
   end
 
 

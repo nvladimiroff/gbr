@@ -548,4 +548,9 @@ module CPU::Instructions
       self.half_carry_flag = false
     end
 
+
+    def debug
+     # debugger
+    end
+
 end

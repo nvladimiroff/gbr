@@ -76,7 +76,7 @@ module CPU::Opcodes
     0x3D => (dec a),
     0x3E => (ld a, n8),
     0x3F => (ccf),
-    0x40 => (ld b, b),
+    0x40 => (debug),
     0x41 => (ld b, c),
     0x42 => (ld b, d),
     0x43 => (ld b, e),

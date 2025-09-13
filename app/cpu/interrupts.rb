@@ -11,11 +11,11 @@ module CPU::Interrupts
   INTERRUPT_TYPES = [:vblank, :lcd_stat, :timer_overflow, :serial, :joypad]
 
   INTERRUPT_BIT_POSITION = {
-    :vblank => 1,
-    :lcd_stat => 2,
-    :timer_overflow => 3,
-    :serial => 4,
-    :joypad => 5
+    :vblank => 0,
+    :lcd_stat => 1,
+    :timer_overflow => 2,
+    :serial => 3,
+    :joypad => 4
   }
 
 
@@ -36,7 +36,7 @@ module CPU::Interrupts
         if @mmu[0xFF0F][INTERRUPT_BIT_POSITION[type]] == 1
           @halted = false
 
-          return unless @ime && interrupt_enabled?(type)
+          next unless @ime && interrupt_enabled?(type)
 
           @mmu[0xFF0F] &= ~(1 << INTERRUPT_BIT_POSITION[type])
           @sp -= 2
