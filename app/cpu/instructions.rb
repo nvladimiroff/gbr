@@ -155,7 +155,7 @@ module CPU::Instructions
       location = args.length == 1 ? args.first : args.second
       increment = to_signed_byte(load(location))
 
-      @pc = increment + @pc if condition_met?(args.first)
+      @pc = (increment + @pc) & 0xFFFF if condition_met?(args.first)
     end
 
 
@@ -342,7 +342,7 @@ module CPU::Instructions
 
       self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
-      self.half_carry_flag = (value & 0xF) - 1 > 0xF;
+      self.half_carry_flag = (new_value & 0xF) == 0xF;
     end
 
 
@@ -413,9 +413,9 @@ module CPU::Instructions
 
 
     def rrca
-      new_value = a >> 1
+      new_value = ((a >> 1) | (a << 7)) & 0xFF
 
-      self.carry_flag = a & 0x01 == 0x01
+      self.carry_flag = a[0] == 1
       self.a = new_value
 
       self.zero_flag = false
@@ -553,5 +553,18 @@ module CPU::Instructions
     def debug
      # debugger
     end
+
+
+    def rla
+      new_value = (a << 1) & 0xFF
+      new_value |= carry_flag ? 1 : 0
+      self.carry_flag = a[7] == 1
+      self.a = new_value
+
+      self.zero_flag = false
+      self.subtract_flag = false
+      self.half_carry_flag = false
+    end
+
 
 end
