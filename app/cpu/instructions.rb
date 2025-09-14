@@ -101,6 +101,12 @@ module CPU::Instructions
     end
 
 
+    def ld_sp
+      addr = n16
+      @mmu.write_word(addr, sp)
+    end
+
+
     def and_(dest, src)
       dest_value = load(dest)
       src_value = load(src)

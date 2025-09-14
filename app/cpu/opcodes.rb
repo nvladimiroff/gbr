@@ -20,7 +20,7 @@ module CPU::Opcodes
     0x05 => (dec b),
     0x06 => (ld b, n8),
     0x07 => (rlca),
-    0x08 => (ld [n16], sp),
+    0x08 => (ld_sp),
     0x09 => (add hl, bc),
     0x0A => (ld a, [bc]),
     0x0B => (dec bc),
