@@ -1,4 +1,9 @@
 require_relative '../config/boot'
+
+# Load our custom Minitest reporter
+require_relative 'minitest/categorize_plugin'
+Minitest.register_plugin('categorize')
+
 require 'minitest/autorun'
 
 class ActiveSupport::TestCase
