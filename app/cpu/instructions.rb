@@ -202,10 +202,10 @@ module CPU::Instructions
 
 
     def add(dest, src)
-      if reg_is_16bit?(src)
-        add16(dest, src)
-      elsif dest == :sp && src == :n8
+      if dest == :sp && src == :n8
         signed_add_to_sp # TODO: make this less bad
+      elsif reg_is_16bit?(dest)
+        add16(dest, src)
       else
         add8(dest, src)
       end
@@ -240,12 +240,14 @@ module CPU::Instructions
     def signed_add_to_sp
       inc = to_signed_byte(n8)
       new_value = sp + inc
-      self.sp = new_value
+
+      self.carry_flag = (sp & 0xFF) + (inc & 0xFF) > 0xFF
+      self.half_carry_flag = (sp & 0xF) + (inc & 0xF) > 0xF
+
+      self.sp = new_value & 0xFFFF
 
       self.zero_flag = false
       self.subtract_flag = false
-      self.carry_flag = new_value > 0xFF
-      self.half_carry_flag = (sp & 0xF) + (inc & 0xF) > 0xF
     end
 
 

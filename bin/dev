@@ -2,4 +2,4 @@
 require_relative '../config/boot'
 
 rom = File.read(ARGV[0]).bytes
-Gameboy.new(rom, RaylibLCD.new).run
+Gameboy.new(rom, lcd: RaylibLCD.new).run
