@@ -498,12 +498,15 @@ module CPU::Instructions
 
 
     def ld_hl_sp_n8
-      self.hl = sp + n8
+      inc = to_signed_byte(n8)
+
+      self.half_carry_flag = (inc & 0x0F) + (sp & 0x0F) > 0x0F
+      self.carry_flag = (inc & 0xFF) + (sp & 0xFF) > 0xFF
+
+      self.hl = sp + inc
 
       self.zero_flag = false
       self.subtract_flag = false
-      self.half_carry_flag = false # TODO: WRONG
-      self.carry_flag = false # TODO: WRONG
     end
 
 
