@@ -26,6 +26,11 @@ module Minitest
         percentage = result[:passed] / (result[:passed] + result[:failed]).to_f
         puts "#{instruction}: #{percentage*100}%"
       end
+
+      failed_total = @groups.sum { |k, v| v[:failed] }
+      passed_total = @groups.sum { |k, v| v[:passed] }
+      total_percentage = passed_total / (passed_total + failed_total).to_f
+      puts "TOTAL: #{total_percentage*100}% "
     end
 
   end
