@@ -30,6 +30,19 @@ module CPU::PrefixedInstructions
   end
 
 
+  def rl(dest)
+    value = load(dest)
+    new_value = (value << 1) & 0xFF
+    new_value |= self.carry_flag ? 1 : 0
+    assign(dest, new_value)
+
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.half_carry_flag = false
+    self.carry_flag = value[7] == 1
+  end
+
+
   def rlc(dest)
   end
 
