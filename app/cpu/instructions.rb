@@ -63,6 +63,8 @@ module CPU::Instructions
 
 
     def reg_is_16bit?(reg)
+      return false if reg.is_a?(Array)
+
       reg.to_s.length > 1 && reg != :n8
     end
 
@@ -278,8 +280,8 @@ module CPU::Instructions
 
       self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
-      self.carry_flag = new_value < 0xFF
-      self.half_carry_flag = (dst_value & 0xF) - (src_value & 0xF) > 0xF;
+      self.carry_flag = dst_value < src_value
+      self.half_carry_flag = (dst_value & 0xF) < (src_value & 0xF);
     end
 
 
@@ -312,7 +314,7 @@ module CPU::Instructions
 
       self.zero_flag = new_value == 0
       self.subtract_flag = false
-      self.half_carry_flag = (value & 0xF) + 1 > 0xF;
+      self.half_carry_flag = (new_value & 0x0F) == 0;
     end
 
 
