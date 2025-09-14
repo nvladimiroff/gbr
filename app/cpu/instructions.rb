@@ -288,13 +288,14 @@ module CPU::Instructions
     def sbc(dest, src)
       src_value = load(src)
       dst_value = load(dest)
-      new_value = src_value - dst_value - (self.carry_flag ? 1 : 0)
+      carry = carry_flag ? 1 : 0
+      new_value = dst_value - (src_value + carry)
       assign(dest, new_value)
 
       self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = true
-      self.carry_flag = new_value < 0xFF
-      self.half_carry_flag = (src_value & 0xF) - (dst_value & 0xF) - (self.carry_flag ? 1 : 0) > 0xF;
+      self.carry_flag = dst_value < (src_value + carry)
+      self.half_carry_flag = (dst_value & 0xF) < (src_value & 0xF) + carry;
     end
 
 
