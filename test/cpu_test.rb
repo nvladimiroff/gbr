@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-class CPUTest < Minitest::Test
+class CPUTest < ActiveSupport::TestCase
 
   def test_nothing
     run_program do

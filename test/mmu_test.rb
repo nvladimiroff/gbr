@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-class MMUTest < Minitest::Test
+class MMUTest < ActiveSupport::TestCase
 
   def test_shadow_wram
     run_program do

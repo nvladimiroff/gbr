@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-class InterruptTest < Minitest::Test
+class InterruptTest < ActiveSupport::TestCase
 
   def test_vblank
     load_program at: 0x40 do

@@ -29,4 +29,24 @@ module CPU::PrefixedInstructions
     self.half_carry_flag = true
   end
 
+
+  def rlc(dest)
+  end
+
+
+  def rrc(dest)
+  end
+
+
+  def sra(dest)
+  end
+
+
+  def sla(dest)
+  end
+
+
+  def srl
+  end
+
 end

@@ -8,11 +8,11 @@ class Gameboy
   delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
 
 
-  def initialize(rom, lcd = nil)
-    @lcd = lcd || HeadlessLCD.new
+  def initialize(rom, **opts)
+    @lcd = opts[:lcd] || HeadlessLCD.new
     @timers = Timers.new
     @cartridge = Cartridge.new(rom)
-    @mmu = MMU.new
+    @mmu = opts[:mmu] || MMU.new
     @cpu = CPU.new(@mmu)
     @ppu = PPU.new(@cpu)
 

@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-class PPUTest < Minitest::Test
+class PPUTest < ActiveSupport::TestCase
 
   def test_render_black_screen
     load_program(at: 0x040) do

@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-class BlarggTest < Minitest::Test
+class BlarggTest < ActiveSupport::TestCase
 
   def test_pop_af
     load_program(at: 0x0200) do

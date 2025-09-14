@@ -1,7 +1,10 @@
 require_relative '../config/boot'
 require 'minitest/autorun'
 
-class Minitest::Test
+class ActiveSupport::TestCase
+
+  parallelize(workers: :number_of_processors)
+
 
   def setup
     @rom = Array.new(0x8000, 0)
