@@ -8,6 +8,20 @@ module CPU::PrefixedInstructions
   end
 
 
+  def rr(dest)
+    dest_value = load(dest)
+    new_value = dest_value >> 1
+    new_value |= self.carry_flag ? 0x80 : 0x00
+
+    assign(dest, new_value)
+
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.half_carry_flag = false
+    self.carry_flag = dest_value[0] == 1
+  end
+
+
   def set(i, dst)
     value = load(dst)
     new_value = value | (1 << i)
