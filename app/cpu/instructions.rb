@@ -262,13 +262,14 @@ module CPU::Instructions
     def adc(dest, src)
       src_value = load(src)
       dst_value = load(dest)
-      new_value = src_value + dst_value + (self.carry_flag ? 1 : 0)
+      carry = carry_flag ? 1 : 0
+      new_value = src_value + dst_value + carry
       assign(dest, new_value)
 
       self.zero_flag = (new_value & 0xFF) == 0
       self.subtract_flag = false
       self.carry_flag = new_value > 0xFF
-      self.half_carry_flag = (src_value & 0xF) + (dst_value & 0xF) + (self.carry_flag ? 1 : 0) > 0xF;
+      self.half_carry_flag = (src_value & 0xF) + (dst_value & 0xF) + carry > 0xF;
     end
 
 
