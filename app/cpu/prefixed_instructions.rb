@@ -2,7 +2,7 @@ module CPU::PrefixedInstructions
 
   def prefix
     instruction = CPU::Opcodes::CB_MAPPING[@mmu[@pc]]
-    @pc += 1
+    @pc = (@pc + 1) & 0xFFFF
 
     send(*instruction)
   end
@@ -58,22 +58,53 @@ module CPU::PrefixedInstructions
 
 
   def rlc(dest)
+    dst_value = load(dest)
+    new_value = (dst_value << 1) | (dst_value >> 7)
+    new_value &= 0xFF
+
+    self.carry_flag = dst_value[7] == 1
+    assign(dest, new_value)
+
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.half_carry_flag = false
   end
 
 
   def rrc(dest)
+    dst_value = load(dest)
+    new_value = ((dst_value >> 1) | (dst_value << 7)) & 0xFF
+
+    self.carry_flag = dst_value[0] == 1
+    assign(dest, new_value)
+
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.half_carry_flag = false
   end
 
 
   def sra(dest)
+    dst_value = load(dest)
+    new_value = (dst_value >> 1) | (dst_value[7] << 7)
+    assign(dest, new_value)
+
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.carry_flag = dst_value[0] == 1
+    self.half_carry_flag = false
   end
 
 
-  def sla(dest)
-  end
+  def srl(dest)
+    dest_value = load(dest)
+    new_value = (dest_value >> 1)
+    assign(dest, new_value)
 
-
-  def srl
+    self.zero_flag = new_value == 0
+    self.subtract_flag = false
+    self.half_carry_flag = false
+    self.carry_flag = dest_value & 0x01 > 0
   end
 
 end

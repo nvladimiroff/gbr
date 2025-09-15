@@ -482,18 +482,6 @@ module CPU::Instructions
     end
 
 
-    def srl(dest)
-      dest_value = load(dest)
-      new_value = dest_value >> 1
-      assign(dest, new_value)
-
-      self.zero_flag = new_value == 0
-      self.subtract_flag = false
-      self.half_carry_flag = false
-      self.carry_flag = dest_value & 0x01 > 0
-    end
-
-
     def ccf
       self.subtract_flag = false
       self.half_carry_flag = false
