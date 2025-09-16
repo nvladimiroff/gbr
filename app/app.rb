@@ -1,0 +1,103 @@
+require 'imgui_impl_raylib'
+
+class App
+
+  attr_writer(:ppu)
+
+  SCALE = 4
+
+
+  def initialize(**opts)
+    @rom = opts[:rom]
+    @gb = Gameboy.new(@rom, lcd: self)
+    if opts[:debug]
+      @debugger = Debugger.new
+    end
+    @last_frame_time = Time.at(0)
+
+    # Raylib init
+    Raylib.load_lib('libraylib')
+    # Dear ImGui Init
+    s = Gem::Specification.find_by_name('imgui-bindings')
+    shared_lib_path = s.full_gem_path + '/lib/'
+
+    ImGui.load_lib(shared_lib_path + 'imgui.arm64.dylib')
+
+    Raylib.InitWindow(PPU::WIDTH*SCALE, PPU::HEIGHT*SCALE, "GBR - #{@gb.cartridge.title}")
+    image = Raylib.GenImageColor(PPU::WIDTH, PPU::HEIGHT, Raylib::RAYWHITE)
+    image.format = Raylib::PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
+    @texture = Raylib.LoadTextureFromImage(image)
+
+    ImGui::CreateContext()
+    ImGui::StyleColorsDark()
+
+    # Link Raylib and Dear ImGui together.
+    ImGui.ImplRaylib_Init()
+
+    io = ImGuiIO.new(ImGui.GetIO())
+    io[:Fonts].AddFontDefault()
+
+    # Build texture atlas
+    pixels = FFI::MemoryPointer.new :pointer
+    width = FFI::MemoryPointer.new :int
+    height = FFI::MemoryPointer.new :int
+    io[:Fonts].GetTexDataAsRGBA32(pixels, width, height, nil)
+
+    # Upload texture to graphics system
+    # [TODO] find standard and safe way to convert RGBA32 array into texture
+    image = Raylib.GenImageColor(width.read_int, height.read_int, Raylib::BLUE)
+    original_data = image[:data]
+    image[:data] = pixels.read_pointer
+
+    texture = Raylib.LoadTextureFromImage(image)
+    image[:data] = original_data
+    Raylib.UnloadImage(image)
+
+    # Store our identifier
+    texture_ptr = FFI::MemoryPointer.new(:uint32)
+    texture_ptr.write(:uint32, texture[:id])
+    io[:Fonts].SetTexID(texture_ptr.read_int)
+  end
+
+
+  def run
+    loop do
+      break if Raylib.WindowShouldClose
+
+      @gb.step
+
+      next unless Time.now - @last_frame_time > 1.0/60
+
+      @last_frame_time = Time.now
+      draw_frame
+    end
+
+    ImGui::ImplRaylib_Shutdown()
+    ImGui::DestroyContext(nil)
+
+    Raylib.CloseWindow
+  end
+
+
+  private
+
+    def draw_frame
+      Raylib.BeginDrawing
+        Raylib.ClearBackground(Raylib::BLACK)
+
+        # Render the emulator
+        Raylib.UpdateTexture(@texture, @ppu.pixels.pack('N*'))
+        Raylib.DrawTextureEx(@texture, Raylib::Vector2.create(0, 0), 0.0, SCALE, Raylib::RAYWHITE)
+
+        ImGui::ImplRaylib_NewFrame()
+        ImGui::NewFrame()
+
+        @debugger&.draw
+
+        ImGui::Render()
+        # Render Dear ImGui to Raylib.
+        ImGui::ImplRaylib_RenderDrawData(ImGui::GetDrawData())
+      Raylib.EndDrawing
+    end
+
+end

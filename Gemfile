@@ -9,7 +9,8 @@ gem 'semantic_logger'
 gem 'rake'
 
 # Graphics
-gem 'raylib-bindings', '~> 0.7.3', require: 'raylib'
+gem 'raylib-bindings', require: 'raylib'
+gem 'imgui-bindings', require: 'imgui'
 
 # Testing
 gem 'minitest'

@@ -1,10 +1,6 @@
 class Gameboy
 
-  class << self
-    attr_accessor(:instance)
-  end
-
-  attr_reader(:cpu, :mmu, :ppu, :lcd)
+  attr_reader(:cpu, :mmu, :ppu, :lcd, :cartridge)
   delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
 
 
@@ -16,20 +12,9 @@ class Gameboy
     @cpu = CPU.new(@mmu)
     @ppu = PPU.new(@cpu)
 
-    # TODO: this makes a cycle (mmu => cpu => ppu => mmu)
-    # Am I ok with that?
-    @mmu.wire(@cartridge, @ppu, @timers)
-    self.class.instance = self
-  end
-
-
-  def run
-    @lcd.open_window(@cartridge.title)
-    print_debug_info
-
-    loop do
-      step
-    end
+    # TODO: this makes a cycle. Am I ok with that?
+    @mmu.wire(@cpu, @cartridge, @ppu, @timers)
+    @lcd.ppu = @ppu
   end
 
 
@@ -37,7 +22,6 @@ class Gameboy
     @cpu.step
     @ppu.step(by: @cpu.last_ticks)
     @timers.step(by: @cpu.last_ticks)
-    @lcd.render_frame(@ppu.pixels)
   end
 
 
