@@ -179,7 +179,7 @@ class PPU
       return unless lcd_enabled?
 
       render_tiles
-      #render_sprite_scanline if sprites_enabled?
+      render_sprite_scanline if sprites_enabled?
     end
 
 
@@ -231,13 +231,13 @@ class PPU
         if @ly >= sprite[:y] && @ly < (sprite[:y] + 8)
           line = @ly - sprite[:y]
 
-          byte_1 = @vram[sprite[:tile] * 16 + line]
-          byte_2 = @vram[sprite[:tile] * 16 + line + 1]
+          byte_1 = @vram[sprite[:tile] * 16 + line * 2]
+          byte_2 = @vram[sprite[:tile] * 16 + line * 2 + 1]
 
           (0..WIDTH).each do |pixel|
             next unless pixel >= sprite[:x] && pixel < (sprite[:y] + 8)
             color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
-            @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
+            @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color] unless color == 0
           end
         end
       end
