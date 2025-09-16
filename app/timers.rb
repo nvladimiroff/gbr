@@ -1,12 +1,19 @@
 class Timers
 
   def initialize
+    @div_accum = 0
     @div = 0
   end
 
 
   def step(**opts)
-    @div += opts[:by]
+    @div_accum += opts[:by]
+
+    if @div_accum >= 255
+      @div += 1
+      @div &= 0xFFFF
+      @div_accum = 0
+    end
   end
 
 
