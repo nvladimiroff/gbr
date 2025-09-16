@@ -4,15 +4,13 @@ class MMU
     @wram = Array.new(0x2000, 0)
     @zram = Array.new(0x80, 0)
 
-    @interrupt_requested = 0x00
-    @interrupt_enabled = 0xFF
-
     # TEMP
-    @joypad = 0xCF
+    @joypad = 0xFF
   end
 
 
-  def wire(cartridge, ppu, timers)
+  def wire(cpu, cartridge, ppu, timers)
+    @cpu = cpu
     @cartridge = cartridge
     @ppu = ppu
     @timers = timers
@@ -47,7 +45,7 @@ class MMU
     when 0xFF04..0xFF07
       @timers[addr]
     when 0xFF0F
-      @interrupt_requested
+      @cpu.if
     when 0xFF10..0xFF3F
       # TODO: Sound
       0xFF
@@ -55,12 +53,12 @@ class MMU
       @ppu[addr]
     when 0xFF00..0xFF7F
       # TODO: Other IO I haven't implemented yet.
-      $logger.warn('Unimplemented memory read', addr: addr.to_hex)
+      #$logger.warn('Unimplemented memory read', addr: addr.to_hex)
       0xFF
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80]
     when 0xFFFF
-      @interrupt_enabled
+      @cpu.ie
     end
   end
 
@@ -92,7 +90,7 @@ class MMU
     when 0xFF04..0xFF07
       @timers[addr] = value
     when 0xFF0F
-      @interrupt_requested = value
+      @cpu.if = value
     when 0xFF10..0xFF3F
       # TODO: Sound
     when 0xFF46
@@ -106,11 +104,11 @@ class MMU
       @ppu[addr] = value
     when 0xFF00..0xFF7F
       # TODO: Other IO I haven't implemented yet.
-      $logger.warn('Unimplemented memory write', addr: addr.to_hex, value: value.to_hex)
+      #$logger.warn('Unimplemented memory write', addr: addr.to_hex, value: value.to_hex)
     when 0xFF80..0xFFFE
       @zram[addr - 0xFF80] = value
     when 0xFFFF
-      @interrupt_enabled = value
+      @cpu.ie = value
     end
   end
 

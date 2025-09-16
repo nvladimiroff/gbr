@@ -20,25 +20,26 @@ module CPU::Interrupts
 
 
   def interrupt(type)
-    @mmu[0xFF0F] |= 1 << INTERRUPT_BIT_POSITION[type]
+    @if |= 1 << INTERRUPT_BIT_POSITION[type]
   end
 
 
   private
 
     def interrupt_enabled?(type)
-      @mmu[0xFFFF][INTERRUPT_BIT_POSITION[type]] == 1
+      @ie[INTERRUPT_BIT_POSITION[type]] == 1
     end
 
 
     def handle_interrupts
       INTERRUPT_TYPES.each do |type|
-        if @mmu[0xFF0F][INTERRUPT_BIT_POSITION[type]] == 1
+        # This is a hot path. Be fast!
+        if @if[INTERRUPT_BIT_POSITION[type]] == 1
           @halted = false
 
           next unless @ime && interrupt_enabled?(type)
 
-          @mmu[0xFF0F] &= ~(1 << INTERRUPT_BIT_POSITION[type])
+          @if &= ~(1 << INTERRUPT_BIT_POSITION[type])
           @sp -= 2
           @mmu.write_word(@sp, @pc)
           @pc = INTERRUPT_ADDRESS_MAPPING[type]
