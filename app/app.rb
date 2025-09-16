@@ -2,6 +2,7 @@ require 'imgui_impl_raylib'
 
 class App
 
+  attr_accessor(:paused)
   attr_writer(:ppu)
 
   SCALE = 4
@@ -10,10 +11,9 @@ class App
   def initialize(**opts)
     @rom = opts[:rom]
     @gb = Gameboy.new(@rom, lcd: self)
-    if opts[:debug]
-      @debugger = Debugger.new
-    end
+    @debugger = Debugger.new(@gb, self) if opts[:debug]
     @last_frame_time = Time.at(0)
+    @paused = false
 
     # Raylib init
     Raylib.load_lib('libraylib')
@@ -64,7 +64,7 @@ class App
     loop do
       break if Raylib.WindowShouldClose
 
-      @gb.step
+      @gb.step unless @paused
 
       next unless Time.now - @last_frame_time > 1.0/60
 
@@ -93,6 +93,7 @@ class App
         ImGui::NewFrame()
 
         @debugger&.draw
+        #ImGui::ShowDemoWindow()
 
         ImGui::Render()
         # Render Dear ImGui to Raylib.

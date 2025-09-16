@@ -1,7 +1,7 @@
 class PPU
 
   attr_accessor(:scy, :scx, :wx, :wy)
-  attr_reader(:pixels, :ly, :lyc)
+  attr_reader(:pixels, :ly, :lyc, :lcdc, :lcdc_stat)
 
   WIDTH = 160
   HEIGHT = 144
