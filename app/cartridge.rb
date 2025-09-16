@@ -58,7 +58,7 @@ class Cartridge
     when 0x6000..0x7FFF
       # TODO: Mysterious clock stuff.
     when 0xA000..0xBFFF
-      @ram[addr - 0xA000 + 0x2000 * @ram_bank]
+      @ram[addr - 0xA000 + 0x2000 * @ram_bank] = value
       # TODO: Also more mysterious clock stuff.
     end
   end
