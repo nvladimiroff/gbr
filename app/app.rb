@@ -5,7 +5,7 @@ class App
   attr_accessor(:paused)
   attr_writer(:ppu)
 
-  SCALE = 4
+  SCALE = 5
 
 
   def initialize(**opts)
@@ -69,6 +69,7 @@ class App
       next unless Time.now - @last_frame_time > 1.0/60
 
       @last_frame_time = Time.now
+      handle_input
       draw_frame
     end
 
@@ -99,6 +100,29 @@ class App
         # Render Dear ImGui to Raylib.
         ImGui::ImplRaylib_RenderDrawData(ImGui::GetDrawData())
       Raylib.EndDrawing
+    end
+
+
+    def handle_input
+      @gb.joypad.press(:right) if Raylib.IsKeyPressed(Raylib::KEY_RIGHT)
+      @gb.joypad.press(:left) if Raylib.IsKeyPressed(Raylib::KEY_LEFT)
+      @gb.joypad.press(:up) if Raylib.IsKeyPressed(Raylib::KEY_UP)
+      @gb.joypad.press(:down) if Raylib.IsKeyPressed(Raylib::KEY_DOWN)
+
+      @gb.joypad.press(:a) if Raylib.IsKeyPressed(Raylib::KEY_Z)
+      @gb.joypad.press(:b) if Raylib.IsKeyPressed(Raylib::KEY_X)
+      @gb.joypad.press(:start) if Raylib.IsKeyPressed(Raylib::KEY_C)
+      @gb.joypad.press(:select) if Raylib.IsKeyPressed(Raylib::KEY_V)
+
+      @gb.joypad.release(:right) if Raylib.IsKeyReleased(Raylib::KEY_RIGHT)
+      @gb.joypad.release(:left) if Raylib.IsKeyReleased(Raylib::KEY_LEFT)
+      @gb.joypad.release(:up) if Raylib.IsKeyReleased(Raylib::KEY_UP)
+      @gb.joypad.release(:down) if Raylib.IsKeyReleased(Raylib::KEY_DOWN)
+
+      @gb.joypad.release(:a) if Raylib.IsKeyReleased(Raylib::KEY_Z)
+      @gb.joypad.release(:b) if Raylib.IsKeyReleased(Raylib::KEY_X)
+      @gb.joypad.release(:start) if Raylib.IsKeyReleased(Raylib::KEY_C)
+      @gb.joypad.release(:select) if Raylib.IsKeyReleased(Raylib::KEY_V)
     end
 
 end

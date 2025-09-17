@@ -1,11 +1,12 @@
 class Gameboy
 
-  attr_reader(:cpu, :mmu, :ppu, :lcd, :cartridge)
+  attr_reader(:cpu, :mmu, :ppu, :lcd, :cartridge, :input, :joypad)
   delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
 
 
   def initialize(rom, **opts)
     @lcd = opts[:lcd] || HeadlessLCD.new
+    @joypad = Joypad.new
     @timers = Timers.new
     @cartridge = Cartridge.new(rom)
     @mmu = opts[:mmu] || MMU.new
@@ -13,7 +14,7 @@ class Gameboy
     @ppu = PPU.new(@cpu)
 
     # TODO: this makes a cycle. Am I ok with that?
-    @mmu.wire(@cpu, @cartridge, @ppu, @timers)
+    @mmu.wire(@cpu, @cartridge, @ppu, @timers, @joypad)
     @lcd.ppu = @ppu
   end
 

@@ -3,17 +3,15 @@ class MMU
   def initialize
     @wram = Array.new(0x2000, 0)
     @zram = Array.new(0x80, 0)
-
-    # TEMP
-    @joypad = 0xFF
   end
 
 
-  def wire(cpu, cartridge, ppu, timers)
+  def wire(cpu, cartridge, ppu, timers, joypad)
     @cpu = cpu
     @cartridge = cartridge
     @ppu = ppu
     @timers = timers
+    @joypad = joypad
   end
 
 
@@ -38,7 +36,7 @@ class MMU
       # Unusable
       0xFF
     when 0xFF00
-      @joypad
+      @joypad.read
     when 0xFF01..0xFF02
       # TODO: Serial communication
       0xFF
@@ -82,7 +80,7 @@ class MMU
     when 0xFEA0..0xFEFF
       # Unusable
     when 0xFF00
-      @joypad = value
+      @joypad.write(value)
     when 0xFF01
       STDOUT.write(value.chr)
     when 0xFF02
