@@ -16,7 +16,7 @@ class App
     @paused = false
 
     # Raylib init
-    Raylib.load_lib('libraylib')
+    Raylib.load_lib('./libraylib.dylib')
     # Dear ImGui Init
     s = Gem::Specification.find_by_name('imgui-bindings')
     shared_lib_path = s.full_gem_path + '/lib/'
@@ -94,16 +94,18 @@ class App
         ImGui::NewFrame()
 
         @debugger&.draw
-        #ImGui::ShowDemoWindow()
 
         ImGui::Render()
         # Render Dear ImGui to Raylib.
         ImGui::ImplRaylib_RenderDrawData(ImGui::GetDrawData())
+        Raylib.SwapScreenBuffer()
       Raylib.EndDrawing
     end
 
 
     def handle_input
+      Raylib.PollInputEvents()
+
       @gb.joypad.press(:right) if Raylib.IsKeyPressed(Raylib::KEY_RIGHT)
       @gb.joypad.press(:left) if Raylib.IsKeyPressed(Raylib::KEY_LEFT)
       @gb.joypad.press(:up) if Raylib.IsKeyPressed(Raylib::KEY_UP)
