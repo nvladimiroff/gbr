@@ -235,7 +235,7 @@ class PPU
           byte_2 = @vram[sprite[:tile] * 16 + line * 2 + 1]
 
           (0..WIDTH).each do |pixel|
-            next unless pixel >= sprite[:x] && pixel < (sprite[:y] + 8)
+            next unless pixel >= sprite[:x] && pixel < (sprite[:x] + 8)
             color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
             @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color] unless color == 0
           end
