@@ -11,6 +11,7 @@ class Debugger
     ImGui::SetNextWindowSize(ImVec2.create(300, 400), 2)
     ImGui::Begin('Debugger')
 
+
     if ImGui::Button(@app.paused ? 'Resume' : 'Pause')
       @app.paused = !@app.paused
     end
@@ -28,6 +29,10 @@ class Debugger
       end
       if ImGui::BeginTabItem('PPU')
         draw_ppu_info
+        ImGui::EndTabItem()
+      end
+      if ImGui::BeginTabItem('Eval')
+        draw_eval_widget
         ImGui::EndTabItem()
       end
 
@@ -88,5 +93,18 @@ class Debugger
       ImGui::Text("Sprite size: #{@gb.ppu.lcdc[2] == 0 ? '8x8' : '8x16'}")
     end
 
+
+    def draw_eval_widget
+      @expr = FFI::MemoryPointer.new(:char, 128)
+      if ImGui::InputText('Code', @expr, @expr.size, ImGuiInputTextFlags_EnterReturnsTrue)
+        begin
+          @result = @gb.instance_eval(@expr.read_string)
+        rescue => e
+          @result = e
+        end
+      end
+
+      ImGui::Text("Result: #{@result}")
+    end
 
 end
