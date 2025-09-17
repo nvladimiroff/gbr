@@ -248,12 +248,13 @@ class PPU
       y = @oam[index * 4] - 16
       x = @oam[index * 4 + 1] - 8
       tile = @oam[index * 4 + 2]
-      _attributes = @oam[index * 4 + 3]
+      attributes = @oam[index * 4 + 3]
 
       {
         x:,
         y:,
-        tile:
+        tile:,
+        attributes:
       }
     end
 

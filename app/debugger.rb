@@ -31,6 +31,10 @@ class Debugger
         draw_ppu_info
         ImGui::EndTabItem()
       end
+      if ImGui::BeginTabItem('OAM')
+        draw_oam_info
+        ImGui::EndTabItem()
+      end
       if ImGui::BeginTabItem('Eval')
         draw_eval_widget
         ImGui::EndTabItem()
@@ -91,6 +95,19 @@ class Debugger
       ImGui::Text("BG/Window tile data mode: #{@gb.ppu.lcdc[4] == 1 ? 'unsigned' : 'signed'}")
       ImGui::Spacing()
       ImGui::Text("Sprite size: #{@gb.ppu.lcdc[2] == 0 ? '8x8' : '8x16'}")
+    end
+
+
+    def draw_oam_info
+      40.times do |sprite_index|
+        sprite = @gb.ppu.send(:read_sprite, sprite_index) # TODO: don't call a private method.
+
+        ImGui::Text("Sprite #{sprite_index}")
+        ImGui::Text("X, Y: #{sprite[:x]}, #{sprite[:y]}")
+        ImGui::Text("Tile: #{sprite[:tile]}")
+        ImGui::Text("Attributes: #{sprite[:attributes].to_s(2)}")
+        ImGui::Spacing()
+      end
     end
 
 
