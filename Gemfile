@@ -12,6 +12,9 @@ gem 'rake'
 gem 'raylib-bindings', require: 'raylib'
 gem 'imgui-bindings', require: 'imgui'
 
+# Benchmarking
+gem 'stackprof'
+
 # Testing
 gem 'minitest'
 gem 'debug'

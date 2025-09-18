@@ -88,6 +88,7 @@ GEM
     securerandom (0.4.1)
     semantic_logger (4.17.0)
       concurrent-ruby (~> 1.0)
+    stackprof (0.2.27)
     stringio (3.1.7)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -117,6 +118,7 @@ DEPENDENCIES
   rake
   raylib-bindings
   semantic_logger
+  stackprof
   zeitwerk
 
 BUNDLED WITH
