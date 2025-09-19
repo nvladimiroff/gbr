@@ -426,16 +426,25 @@ module CPU::Instructions
 
 
     def ldh(dest, src)
-      src_value = case src
-      when :a then a
-      when [:c] then @mmu[0xFF00 + c]
-      when [:n8] then @mmu[0xFF00 + n8]
+      src_value = nil
+      if src == :a
+        src_value = a
+      elsif src.is_a?(Array)
+        if src[0] == :c
+          src_value = @mmu[0xFF00 + c]
+        elsif src[0] == :n8
+          src_value = @mmu[0xFF00 + n8]
+        end
       end
 
-      case dest
-      when :a then self.a = src_value
-      when [:c] then @mmu[0xFF00 + c] = src_value
-      when [:n8] then @mmu[0xFF00 + n8] = src_value
+      if dest == :a
+        self.a = src_value
+      elsif dest.is_a?(Array)
+        if dest[0] == :c
+          @mmu[0xFF00 + c] = src_value
+        elsif dest[0] == :n8
+          @mmu[0xFF00 + n8] = src_value
+        end
       end
     end
 

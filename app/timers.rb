@@ -6,8 +6,8 @@ class Timers
   end
 
 
-  def step(**opts)
-    @div_accum += opts[:by]
+  def step(by)
+    @div_accum += by
 
     if @div_accum >= 255
       @div += 1

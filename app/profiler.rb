@@ -1,6 +1,6 @@
 class Profiler
 
-  INSTRUCTIONS = 1_000_000
+  INSTRUCTIONS = 10_000_000
 
 
   def initialize(**opts)
@@ -11,7 +11,7 @@ class Profiler
 
   def run
     start = Time.now
-    StackProf.run(mode: :object, out: 'gb.dump', raw: true, interval: 5) do
+    StackProf.run(mode: :cpu, out: 'gb.dump', raw: true) do
       INSTRUCTIONS.times do
         @gb.step
       end

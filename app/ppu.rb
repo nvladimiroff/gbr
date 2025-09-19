@@ -37,22 +37,22 @@ class PPU
   end
 
 
-  def step(**opts)
+  def step(by)
     return  unless lcd_enabled?
 
-    @clock += opts[:by]
+    @clock += by
 
     case @mode
     when :oam
-      transition(:draw) if elapsed(cycles: 80)
+      transition(:draw) if elapsed(80)
     when :draw
-      if elapsed(cycles: 172)
+      if elapsed(172)
         render_scanline
         transition(:hblank)
         @cpu.interrupt(:lcd_stat) if @ly == @lyc
       end
     when :hblank
-      if elapsed(cycles: 204)
+      if elapsed(204)
         @ly += 1
         @cpu.interrupt(:lcd_stat) if @ly == @lyc
 
@@ -64,7 +64,7 @@ class PPU
         end
       end
     when :vblank
-      if elapsed(cycles: 456)
+      if elapsed(456)
         @ly += 1
         @cpu.interrupt(:lcd_stat) if @ly == @lyc
 
@@ -150,9 +150,9 @@ class PPU
 
   private
 
-    def elapsed(**opts)
-      if @clock >= opts[:cycles]
-        @clock -= opts[:cycles]
+    def elapsed(cycles)
+      if @clock >= cycles
+        @clock -= cycles
         true
       else
         false
@@ -224,18 +224,22 @@ class PPU
 
 
     def render_sprite_scanline
-      40.times do |sprite_index|
-        sprite = read_sprite(sprite_index)
+      40.times do |index|
+        # Read the sprite
+        y = @oam[index * 4] - 16
+        x = @oam[index * 4 + 1] - 8
+        tile = @oam[index * 4 + 2]
+        attributes = @oam[index * 4 + 3]
 
         # Is this sprite on the current scanline?
-        if @ly >= sprite[:y] && @ly < (sprite[:y] + 8)
-          line = @ly - sprite[:y]
+        if @ly >= y && @ly < (y + 8)
+          line = @ly - y
 
-          byte_1 = @vram[sprite[:tile] * 16 + line * 2]
-          byte_2 = @vram[sprite[:tile] * 16 + line * 2 + 1]
+          byte_1 = @vram[tile * 16 + line * 2]
+          byte_2 = @vram[tile * 16 + line * 2 + 1]
 
           (0..WIDTH).each do |pixel|
-            next unless pixel >= sprite[:x] && pixel < (sprite[:x] + 8)
+            next unless pixel >= x && pixel < (x + 8)
             color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
             @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color] unless color == 0
           end

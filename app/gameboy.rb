@@ -21,8 +21,8 @@ class Gameboy
 
   def step
     @cpu.step
-    @ppu.step(by: @cpu.last_ticks)
-    @timers.step(by: @cpu.last_ticks)
+    @ppu.step(@cpu.last_ticks)
+    @timers.step(@cpu.last_ticks)
   end
 
 

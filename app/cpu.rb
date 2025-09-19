@@ -4,8 +4,6 @@ class CPU
 
   attr_accessor(:sp, :pc, :ie, :if)
   attr_reader(:op, :last_ticks)
-  reg_8_bit(:a, :b, :c, :d, :e, :h, :l) # F gets special handling
-  reg_16_bit(:bc, :de, :hl) # AF gets special handling
 
 
   def initialize(mmu)
@@ -47,10 +45,6 @@ class CPU
     @prev_op = @op
     @op = @mmu[@pc]
     @pc = (@pc + 1) & 0xFFFF
-    $logger.debug("Running instruction", :payload => {
-      :op => MAPPING[@op],
-      :pc => @pc.to_hex
-    })
     decode_and_execute(@op)
   rescue => e
     $logger.error("Error during instruction: #{@op&.to_hex}", :exception => e)
