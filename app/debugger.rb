@@ -1,9 +1,13 @@
 class Debugger
 
+  attr_reader(:debug_ppu)
+
 
   def initialize(gb, app)
     @gb = gb
     @app = app
+
+    @debug_ppu = false
   end
 
 
@@ -44,6 +48,8 @@ class Debugger
     end
 
     ImGui::End()
+
+    draw_ppu_tile_lines if @debug_ppu
   end
 
 
@@ -83,7 +89,18 @@ class Debugger
 
 
     def draw_ppu_info
+      ImGui::Text('Debug mode')
+      ImGui::SameLine()
+      if ImGui::Button(@debug_ppu ? 'Disable' : 'Enable')
+        @debug_ppu = !@debug_ppu
+      end
+
+      ImGui::Spacing()
       ImGui::Text("LY: #{@gb.ppu.ly}")
+      ImGui::Text("SCY: #{@gb.ppu.scy}")
+      ImGui::Text("SCX: #{@gb.ppu.scx}")
+      ImGui::Text("WY: #{@gb.ppu.wy}")
+      ImGui::Text("WX: #{@gb.ppu.wx}")
       ImGui::Spacing()
       ImGui::Text("LCD enabled: #{@gb.ppu.lcdc[7] == 1}")
       ImGui::Text("BG/window enabled: #{@gb.ppu.lcdc[0] == 1}")
@@ -122,6 +139,17 @@ class Debugger
       end
 
       ImGui::Text("Result: #{@result}")
+    end
+
+
+    def draw_ppu_tile_lines
+      (PPU::WIDTH*App::SCALE / 8*App::SCALE).times.map { |x| x*8*App::SCALE }.each do |x|
+        Raylib.DrawLine(x, 0, x, PPU::HEIGHT * App::SCALE, Raylib::RED)
+      end
+
+      (PPU::HEIGHT*App::SCALE / 8*App::SCALE).times.map { |y| y*8*App::SCALE }.each do |y|
+        Raylib.DrawLine(0, y, PPU::WIDTH * App::SCALE, y, Raylib::RED)
+      end
     end
 
 end
