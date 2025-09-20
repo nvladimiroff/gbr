@@ -186,23 +186,24 @@ class PPU
     def render_tiles
       return unless window_enabled? || background_enabled?
 
-      (0..WIDTH).each do |pixel|
+      tile_y = case current_layer
+      when :background
+        ((@ly + @scy) & 0xFF) >> 3
+      when :window
+        (@ly - @wy) / 8
+      end
+
+      (0..WIDTH - 1).each do |pixel|
         @internal_pixel = pixel
         tile_x = case current_layer
         when :background
-          (@scx + pixel)
+          (pixel + @scx) / 8
         when :window
-          (pixel - (@wx - 7))
+          (pixel - (@wx - 7)) / 8
         end
+        tile_x &= 0x1F
 
-        tile_y = case current_layer
-        when :background
-          (@ly + @scy)
-        when :window
-          (@ly - @wy)
-        end
-
-        tile_address = tile_map_start + (tile_y / 8) * 32 + tile_x / 8
+        tile_address = tile_map_start + tile_y * 32 + tile_x
         tile_index = @vram[tile_address]
 
         tile_location = if tile_data_signed?
@@ -211,12 +212,18 @@ class PPU
           tile_data_start + tile_index * 16
         end
 
-        line = (tile_y % 8) * 2
+        offset = case current_layer
+        when :window
+          2 * ((@ly - @wy) % 8)
+        when :background
+          2 * ((@ly + @scy) % 8)
+        end
 
-        byte_1 = @vram[tile_location + line]
-        byte_2 = @vram[tile_location + line + 1]
+        byte_1 = @vram[tile_location + offset]
+        byte_2 = @vram[tile_location + offset + 1]
 
-        color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
+        pixel_index = 7 - ((pixel + @scx) % 8)
+        color = byte_1[pixel_index] | (byte_2[pixel_index] << 1)
         @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color]
       end
 
@@ -238,10 +245,9 @@ class PPU
           byte_1 = @vram[tile * 16 + line * 2]
           byte_2 = @vram[tile * 16 + line * 2 + 1]
 
-          (0..WIDTH).each do |pixel|
-            next unless pixel >= x && pixel < (x + 8)
-            color = byte_1[7 - (pixel % 8)] + byte_2[7 - (pixel % 8)]
-            @pixels[@ly * WIDTH + pixel] = COLOR_MAP[color] unless color == 0
+          (0..7).each do |pixel|
+            color = byte_1[7 - pixel] | (byte_2[7 - pixel] << 1)
+            @pixels[@ly * WIDTH + x + pixel] = COLOR_MAP[color] unless color == 0
           end
         end
       end
