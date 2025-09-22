@@ -254,7 +254,11 @@ class PPU
               pixel
             end
             color = byte_1[pixel_index] | (byte_2[pixel_index] << 1)
-            @pixels[@ly * WIDTH + x + pixel] = COLOR_MAP[color] unless color == 0
+            current_pixel = @ly * WIDTH + x + pixel
+
+            if attributes[7] == 0 || @pixels[current_pixel] == COLOR_MAP[0]
+              @pixels[current_pixel] = COLOR_MAP[color] unless color == 0
+            end
           end
 
           sprites_per_line += 1
