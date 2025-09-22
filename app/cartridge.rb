@@ -19,13 +19,25 @@ class Cartridge
       title << @rom[addr]
     end
 
-    title
+    title.gsub(/\x0/, '')
   end
 
 
   def type
     # See https://gbdev.io/pandocs/The_Cartridge_Header.html for decoding this value
     @rom[0x0147]
+  end
+
+
+  def save
+    File.write("#{title}.sav", @ram.pack('C*'))
+  end
+
+
+  def load
+    if File.exist?("#{title}.sav")
+      @ram = File.read("#{title}.sav").unpack('C*')
+    end
   end
 
 

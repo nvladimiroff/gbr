@@ -2,6 +2,7 @@ class Gameboy
 
   attr_reader(:cpu, :mmu, :ppu, :lcd, :cartridge, :input, :joypad)
   delegate(*%i(a b c d e f l bc de hl), to: :@cpu)
+  delegate(*%i(save load), to: :@cartridge)
 
 
   def initialize(rom, **opts)

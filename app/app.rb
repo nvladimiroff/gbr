@@ -11,6 +11,7 @@ class App
   def initialize(**opts)
     @rom = opts[:rom]
     @gb = Gameboy.new(@rom, lcd: self)
+    @gb.load
     @debugger = Debugger.new(@gb, self) if opts[:debug]
     @last_frame_time = Time.at(0)
     @paused = false
@@ -77,6 +78,8 @@ class App
     ImGui::DestroyContext(nil)
 
     Raylib.CloseWindow
+
+    @gb.save
   end
 
 
