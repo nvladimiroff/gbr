@@ -231,6 +231,7 @@ class PPU
 
 
     def render_sprite_scanline
+      sprites_per_line = 0
       40.times do |index|
         # Read the sprite
         y = @oam[index * 4] - 16
@@ -240,15 +241,23 @@ class PPU
 
         # Is this sprite on the current scanline?
         if @ly >= y && @ly < (y + 8)
+          break if sprites_per_line >= 10
           line = @ly - y
 
           byte_1 = @vram[tile * 16 + line * 2]
           byte_2 = @vram[tile * 16 + line * 2 + 1]
 
           (0..7).each do |pixel|
-            color = byte_1[7 - pixel] | (byte_2[7 - pixel] << 1)
+            pixel_index = if attributes[5] == 0
+              7 - pixel
+            else
+              pixel
+            end
+            color = byte_1[pixel_index] | (byte_2[pixel_index] << 1)
             @pixels[@ly * WIDTH + x + pixel] = COLOR_MAP[color] unless color == 0
           end
+
+          sprites_per_line += 1
         end
       end
     end
