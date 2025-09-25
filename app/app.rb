@@ -28,7 +28,6 @@ class App
     ImGui.load_lib(shared_lib_path + 'imgui.arm64.dylib')
 
     Raylib.InitWindow(PPU::WIDTH*SCALE, PPU::HEIGHT*SCALE, "GBR - #{@gb.cartridge.title}")
-    Raylib.SetWindowState(Raylib::FLAG_VSYNC_HINT)
     image = Raylib.GenImageColor(PPU::WIDTH, PPU::HEIGHT, Raylib::RAYWHITE)
     image.format = Raylib::PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
     @texture = Raylib.LoadTextureFromImage(image)
@@ -67,6 +66,7 @@ class App
 
   def run
     delta = 0
+    Raylib.SetTargetFPS(FPS)
 
     StackProf.run(mode: :cpu, out: 'gb.dump', raw: true) do
       loop do

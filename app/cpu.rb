@@ -1,6 +1,6 @@
 class CPU
 
-  include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions, CPU::Interrupts
+  include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions, CPU::Interrupts, CPU::Timing
 
   attr_accessor(:sp, :pc, :ie, :if)
   attr_reader(:op, :last_cycles)
@@ -11,7 +11,7 @@ class CPU
 
     @pc = 0x0100
     @sp = 0xfffe
-    @last_cycles = 4 # TODO: real timing
+    @last_cycles = 0
 
     # DMG initial values
     @a = 0x01
@@ -31,6 +31,7 @@ class CPU
 
 
   def step
+    @last_cycles = 0
     handle_interrupts
 
     if @enable_ime_next_step
@@ -38,14 +39,18 @@ class CPU
       @ime = true
     end
 
-    return if @halted
+    if @halted
+      @last_cycles += 4
+      return
+    end
+
 
     @prev_op = @op
     @op = @mmu[@pc]
     @pc = (@pc + 1) & 0xFFFF
     decode_and_execute(@op)
 
-    @last_cycles
+    @last_cycles += TIMING[@op].first # TODO: timing for instructions with varying cycles
   rescue => e
     $logger.error("Error during instruction: #{@op&.to_hex}", :exception => e)
   end

@@ -39,6 +39,7 @@ module CPU::Interrupts
 
           next unless @ime && interrupt_enabled?(type)
 
+          @last_cycles += 20
           @if &= ~(1 << INTERRUPT_BIT_POSITION[type])
           @sp -= 2
           @mmu.write_word(@sp, @pc)

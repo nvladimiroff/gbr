@@ -2,6 +2,7 @@ module CPU::PrefixedInstructions
 
   def prefix
     instruction = CPU::Opcodes::CB_MAPPING[@mmu[@pc]]
+    @last_cycles += CPU::Timing::CB_TIMING[@mmu[@pc]].first
     @pc = (@pc + 1) & 0xFFFF
 
     send(*instruction)
