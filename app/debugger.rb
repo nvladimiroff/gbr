@@ -15,10 +15,11 @@ class Debugger
     ImGui::SetNextWindowSize(ImVec2.create(300, 400), 2)
     ImGui::Begin('Debugger')
 
-
     if ImGui::Button(@app.paused ? 'Resume' : 'Pause')
       @app.paused = !@app.paused
     end
+    ImGui::SameLine()
+    ImGui::Text("FPS: #{Raylib.GetFPS()}")
 
     ImGui::Spacing()
 
