@@ -72,11 +72,13 @@ class App
       loop do
         break if Raylib.WindowShouldClose
 
-        while !@paused && delta < CYCLES_PER_FRAME
-          @gb.step
-          delta += @gb.cycles
+        unless @paused
+          while delta < CYCLES_PER_FRAME
+            @gb.step
+            delta += @gb.cycles
+          end
+          delta -= CYCLES_PER_FRAME
         end
-        delta -= CYCLES_PER_FRAME
 
         handle_input
         draw_frame
@@ -96,8 +98,6 @@ class App
 
     def draw_frame
       Raylib.BeginDrawing()
-        Raylib.ClearBackground(Raylib::BLACK)
-
         # Render the emulator
         Raylib.UpdateTexture(@texture, @ppu.pixels.pack('N*'))
         Raylib.DrawTextureEx(@texture, Raylib::Vector2.create(0, 0), 0.0, SCALE, Raylib::RAYWHITE)
