@@ -3,7 +3,7 @@ class CPU
   include CPU::Registers, CPU::Opcodes, CPU::Instructions, CPU::PrefixedInstructions, CPU::Interrupts
 
   attr_accessor(:sp, :pc, :ie, :if)
-  attr_reader(:op, :last_ticks)
+  attr_reader(:op, :last_cycles)
 
 
   def initialize(mmu)
@@ -11,8 +11,7 @@ class CPU
 
     @pc = 0x0100
     @sp = 0xfffe
-    @total_ticks = 0
-    @last_ticks = 4
+    @last_cycles = 4 # TODO: real timing
 
     # DMG initial values
     @a = 0x01
@@ -39,13 +38,14 @@ class CPU
       @ime = true
     end
 
-    @total_ticks += 4 # TODO: real timing
     return if @halted
 
     @prev_op = @op
     @op = @mmu[@pc]
     @pc = (@pc + 1) & 0xFFFF
     decode_and_execute(@op)
+
+    @last_cycles
   rescue => e
     $logger.error("Error during instruction: #{@op&.to_hex}", :exception => e)
   end
@@ -54,11 +54,7 @@ class CPU
   private
 
     def decode_and_execute(opcode)
-      instructions = MAPPING[opcode]
-
-      raise "Unimplemented opcode" unless instructions
-
-      send(*instructions)
+      send(*MAPPING[opcode])
     end
 
 end

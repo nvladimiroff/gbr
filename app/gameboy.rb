@@ -22,13 +22,18 @@ class Gameboy
 
   def step
     @cpu.step
-    @ppu.step(@cpu.last_ticks)
-    @timers.step(@cpu.last_ticks)
+    @ppu.step(@cpu.last_cycles)
+    @timers.step(@cpu.last_cycles)
   end
 
 
   def fire_interrupt(type)
     @cpu.interrupt(type)
+  end
+
+
+  def cycles
+    @cpu.last_cycles
   end
 
 

@@ -6,6 +6,9 @@ class App
   attr_writer(:ppu)
 
   SCALE = 5
+  CLOCK_SPEED = 4_194_304
+  FPS = 60
+  CYCLES_PER_FRAME = CLOCK_SPEED / FPS
 
 
   def initialize(**opts)
@@ -17,7 +20,7 @@ class App
     @paused = false
 
     # Raylib init
-    Raylib.load_lib('./libraylib.dylib')
+    Raylib.load_lib('libraylib')
     # Dear ImGui Init
     s = Gem::Specification.find_by_name('imgui-bindings')
     shared_lib_path = s.full_gem_path + '/lib/'
@@ -62,16 +65,22 @@ class App
 
 
   def run
-    loop do
-      break if Raylib.WindowShouldClose
+    delta = 0
+    Raylib.SetTargetFPS(FPS)
 
-      @gb.step unless @paused
+    StackProf.run(mode: :cpu, out: 'gb.dump', raw: true) do
+      loop do
+        break if Raylib.WindowShouldClose
 
-      next unless Time.now - @last_frame_time > 1.0/60
+        while !@paused && delta < CYCLES_PER_FRAME
+          @gb.step
+          delta += @gb.cycles
+        end
+        delta -= CYCLES_PER_FRAME
 
-      @last_frame_time = Time.now
-      handle_input
-      draw_frame
+        handle_input
+        draw_frame
+      end
     end
 
     ImGui::ImplRaylib_Shutdown()
@@ -86,7 +95,7 @@ class App
   private
 
     def draw_frame
-      Raylib.BeginDrawing
+      Raylib.BeginDrawing()
         Raylib.ClearBackground(Raylib::BLACK)
 
         # Render the emulator
@@ -101,14 +110,11 @@ class App
         ImGui::Render()
         # Render Dear ImGui to Raylib.
         ImGui::ImplRaylib_RenderDrawData(ImGui::GetDrawData())
-        Raylib.SwapScreenBuffer()
-      Raylib.EndDrawing
+      Raylib.EndDrawing()
     end
 
 
     def handle_input
-      Raylib.PollInputEvents()
-
       @gb.joypad.press(:right) if Raylib.IsKeyPressed(Raylib::KEY_RIGHT)
       @gb.joypad.press(:left) if Raylib.IsKeyPressed(Raylib::KEY_LEFT)
       @gb.joypad.press(:up) if Raylib.IsKeyPressed(Raylib::KEY_UP)
