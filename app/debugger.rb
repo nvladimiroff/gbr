@@ -20,6 +20,8 @@ class Debugger
     end
     ImGui::SameLine()
     ImGui::Text("FPS: #{Raylib.GetFPS()}")
+    ImGui::SameLine()
+    ImGui::Text("Frame: #{(Raylib.GetFrameTime() * 1000).round(1)}ms")
 
     ImGui::Spacing()
 
